@@ -4,13 +4,14 @@ project(gSQLite)
 # Flag which tells cmake to output all compilation commands used.
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wpedantic")
 set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -flto")
 
 find_library(SQLITE sqlite3 REQUIRED)
 
-add_library(libgsqlite gsqlite.cc interfaces.h)
+add_library(gsqlitel STATIC gsqlite interfaces)
 add_executable(gsqlite gsqlite.cc)
-target_link_libraries(gsqlite ${SQLITE} libgsqlite)
+target_link_libraries(gsqlite ${SQLITE} gsqlitel)
 
 # tests
 enable_testing()
