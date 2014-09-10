@@ -9,7 +9,7 @@ set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -flto")
 
 find_library(SQLITE sqlite3 REQUIRED)
 
-add_library(gsqlitel STATIC gsqlite interfaces)
+add_library(gsqlitel STATIC gsqlite interfaces connection sqlite_common)
 add_executable(gsqlite gsqlite.cc)
 target_link_libraries(gsqlite ${SQLITE} gsqlitel)
 
