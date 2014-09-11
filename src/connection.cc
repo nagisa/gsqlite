@@ -33,7 +33,11 @@ Connection::~Connection()
     this->thread->join();
     if(this->type == 1) ret = sqlite3_close(this->handle);
     if(this->type == 2) ret = sqlite3_close_v2(this->handle);
-    if(ret != SQLITE_OK) throw SQLiteException(ret);
+    if(ret != SQLITE_OK) {
+
+    }
+    // if(ret != SQLITE_OK) throw SQLiteException(ret);
+    // Well, dang. Apparently one should never throw from destructors.
     this->handle = NULL;
 }
 
