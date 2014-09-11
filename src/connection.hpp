@@ -2,6 +2,9 @@
 #define _GSQLITE_CONNECTION
 
 #include <sqlite3.h>
+#include <queue>
+#include <functional>
+#include <glibmm/threads.h>
 
 #include "interfaces.hpp"
 #include "sqlite_common.hpp"
@@ -24,6 +27,14 @@ class Connection : public Showable {
         sqlite3 *handle = NULL;
         int type = 0;
 
+        // TODO: Probably should be abstracted out to a struct or something.
+        Glib::Threads::Mutex   queue_mtx;
+        Glib::Threads::Cond    queue_push;
+        Glib::Threads::Thread *thread;
+        // Lets implement monads, fix the syntax and Haskell is not
+        // too far away! Glory to Artotzka!
+        std::queue<std::function<void ()>> queue;
+        void worker();
 };
 
 
