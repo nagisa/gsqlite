@@ -4,14 +4,7 @@
 #include "../connection.hpp"
 
 int main(void){
-    std::unique_ptr<Connection> c;
-
-    try {
-        c.reset(new Connection(":memory:"));
-    } catch (SQLiteException& e){
-        std::cerr << e.what() << std::endl;
-        return 1;
-    }
+    std::unique_ptr<Connection> c(new Connection(":memory:"));
 
     try {
         c->prepare("");

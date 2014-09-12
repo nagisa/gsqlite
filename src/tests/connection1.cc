@@ -4,11 +4,6 @@
 
 int main(void){
     // Creation of in-memory database should (almost) always succeed;
-    try {
-        Connection a(":memory:");
-    } catch (SQLiteException& e){
-        std::cerr << "Error was thrown for :memory:\n";
-        return 1;
-    }
+    Connection a(":memory:");
     return 0;
 }
