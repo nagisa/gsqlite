@@ -7,8 +7,8 @@ int main(void){
     try {
         Connection a("/");
     } catch (SQLiteException& e){
-        std::cerr << e.what() << std::endl;
         return 0;
     }
+    std::cerr << "Opening database for directory did not fail" << std::endl;
     return 1;
 }

@@ -33,6 +33,7 @@ Connection::~Connection()
     if(ret != SQLITE_OK) {
         // throw SQLiteException(ret);
         // TODO: Well, dang. Apparently one should never throw from destructors.
+        // Maybe log an error or something?
     }
     this->thread = NULL;
     this->handle = NULL;
@@ -41,9 +42,9 @@ Connection::~Connection()
 std::string
 Connection::show()
 {
-    std::stringstream ss;
-    ss << "Connection()";
-    return ss.str();
+    // Keeping filename around just for this is wasteful;
+    // So we’ll just give away Connection() here.
+    return std::string("Connection()");
 }
 
 Statement *
@@ -51,7 +52,6 @@ Connection::prepare(const char *query, int nByte, const char **tail){
     sqlite3_stmt *stmt;
     int err = sqlite3_prepare_v2(this->handle, query, nByte, &stmt, tail);
     if(err != SQLITE_OK) throw SQLiteException(err);
-
     return new Statement([&](jobfn_t job){
         this->add_job(job);
     }, stmt);
@@ -77,7 +77,6 @@ Statement *
 Connection::prepare16(const char *query, const char **tail){
     return this->prepare16(query, -1, tail);
 }
-
 
 void Connection::worker(){
     while(true){

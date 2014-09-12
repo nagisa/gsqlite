@@ -2,7 +2,6 @@
 
 #include "sqlite_common.hpp"
 
-
 SQLiteException::SQLiteException(int code)
 {
     this->code = code;
