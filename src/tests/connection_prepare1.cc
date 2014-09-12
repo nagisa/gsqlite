@@ -7,7 +7,7 @@ int main(void){
     std::unique_ptr<Connection> c;
 
     try {
-        c = std::unique_ptr<Connection>(new Connection(":memory:"));
+        c.reset(new Connection(":memory:"));
     } catch (SQLiteException& e){
         std::cerr << e.what() << std::endl;
         return 1;
