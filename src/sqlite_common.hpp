@@ -20,6 +20,8 @@ class SQLiteException : public std::exception, public Showable {
         int code;
 };
 
+// Custom error codes
+#define _SQLITE_NULL_STMT -1
 
 
 #endif

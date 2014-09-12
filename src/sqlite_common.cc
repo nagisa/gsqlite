@@ -11,7 +11,13 @@ SQLiteException::SQLiteException(int code)
 const char *
 SQLiteException::what() const throw()
 {
-    return sqlite3_errstr(this->code);
+    if(this->code >= 0) return sqlite3_errstr(this->code);
+    else switch(this->code) {
+        case _SQLITE_NULL_STMT:
+            return "query is empty or miscellaneous error has occurred";
+        default:
+            return "unknown error";
+    }
 }
 
 

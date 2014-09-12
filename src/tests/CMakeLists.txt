@@ -9,3 +9,5 @@ endmacro("test_it")
 
 test_it(connection1)
 test_it(connection2)
+test_it(connection_prepare1)
+test_it(connection_prepare2)
