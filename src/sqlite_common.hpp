@@ -13,9 +13,10 @@ typedef std::function<void ()> jobfn_t;
 class SQLiteException : public std::exception, public Showable {
     public:
         SQLiteException(int code);
-        virtual ~SQLiteException() noexcept {};
-        virtual const char* what() const throw();
-        virtual std::string show();
+        ~SQLiteException() noexcept {};
+
+        const char* what() const throw() override;
+        std::string show() override;
     private:
         int code;
 };
