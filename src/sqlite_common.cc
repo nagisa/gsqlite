@@ -15,6 +15,8 @@ SQLiteException::what() const throw()
     else switch(this->code) {
         case _SQLITE_NULL_STMT:
             return "query is empty or miscellaneous error has occurred";
+        case _SQLITE_ROW_ERR:
+            return "internal error: Row initialized incorrectly";
         default:
             return "unknown error";
     }

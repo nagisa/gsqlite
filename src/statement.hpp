@@ -1,7 +1,11 @@
 #ifndef _GSQLITE_STATEMENT
 #define _GSQLITE_STATEMENT
 
+#include <future>
+
 #include "sqlite_common.hpp"
+#include "row.hpp"
+
 
 
 /// A single query to a previously opened database.
@@ -16,8 +20,14 @@ class Statement : public Showable {
         Statement(std::function<void (jobfn_t)>, sqlite3_stmt *);
         ~Statement();
 
-        std::string show() override;
+        /// Retrieve a next row from the list of query results. Non-blocking.
+        /// Will throw an exception when there’s no more results as well as
+        /// when an error occurs. Call to next() invalidates any Row object
+        /// retrieved by this Statement.
+        // TODO: ensure that invalidated row cannot be used.
+        std::future<Row> next();
 
+        std::string show() override;
     private:
         sqlite3_stmt *statement;
         std::function<void (jobfn_t)> schedule_fn;
