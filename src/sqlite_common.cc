@@ -16,12 +16,19 @@ SQLiteException::what() const throw()
         case _SQLITE_NULL_STMT:
             return "query is empty or miscellaneous error has occurred";
         case _SQLITE_ROW_ERR:
-            return "internal error: Row initialized incorrectly";
+            return "row initialized without values";
+        case _SQLITE_INVALID_ROW:
+            return "row is invalid";
         default:
             return "unknown error";
     }
 }
 
+bool
+SQLiteException::liberr()
+{
+    return this->code >= 0;
+}
 
 std::string
 SQLiteException::show()

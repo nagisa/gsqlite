@@ -17,13 +17,16 @@ class SQLiteException : public std::exception, public Showable {
 
         const char* what() const throw() override;
         std::string show() override;
+        bool liberr();
     private:
         int code;
 };
 
+
 // Custom error codes
 #define _SQLITE_NULL_STMT -1
 #define _SQLITE_ROW_ERR -2
+#define _SQLITE_INVALID_ROW -3
 
 
 #endif

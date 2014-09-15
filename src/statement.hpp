@@ -25,11 +25,12 @@ class Statement : public Showable {
         /// when an error occurs. Call to next() invalidates any Row object
         /// retrieved by this Statement.
         // TODO: ensure that invalidated row cannot be used.
-        std::future<Row> next();
+        std::future<std::shared_ptr<Row>> next();
 
         std::string show() override;
     private:
         sqlite3_stmt *statement;
+        std::weak_ptr<Row> last_row;
         std::function<void (jobfn_t)> schedule_fn;
 };
 

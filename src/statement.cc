@@ -32,10 +32,11 @@ std::vector<sqlite3_value *> collect_cols(int cols, sqlite3_stmt* stmt){
     return vec;
 }
 
-std::future<Row>
+std::future<std::shared_ptr<Row>>
 Statement::next()
 {
-    auto promise = new std::promise<Row>;
+    auto promise = new std::promise<std::shared_ptr<Row>>;
+    if(!this->last_row.expired()){{ this->last_row.lock()->invalidate(); }}
     this->schedule_fn([&, promise](){
         try {
             int ret = SQLITE_BUSY;
@@ -48,7 +49,9 @@ Statement::next()
                     {
                     const int cols = sqlite3_column_count(this->statement);
                     auto vals = collect_cols(cols, this->statement);
-                    promise->set_value(std::move(Row(std::move(vals))));
+                    auto row = std::make_shared<Row>(std::move(vals));
+                    this->last_row = row;
+                    promise->set_value(row);
                     }
                     break;
                 default:

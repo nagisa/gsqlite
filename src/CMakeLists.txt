@@ -23,4 +23,3 @@ target_link_libraries(gsqlite ${ALL_LIBRARIES})
 # tests
 enable_testing()
 add_subdirectory(tests)
-

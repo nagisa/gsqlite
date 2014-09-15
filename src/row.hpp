@@ -10,11 +10,16 @@ class Row : public Showable {
         Row(std::vector<sqlite3_value *>);
         ~Row();
 
-        std::string show() override;
         // This API is still in brainstorming stage;
         // template<T> T get(int column);
+        void invalidate();
+
+        std::string show() override;
     private:
         std::vector<sqlite3_value *> values;
+
+        bool invalid = false;
+        void ensure_valid();
 };
 
 

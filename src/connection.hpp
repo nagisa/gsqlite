@@ -27,7 +27,6 @@ class Connection : public Showable {
         Statement* prepare16(const char *query, const char **tail);
 
         std::string show() override;
-
     private:
         sqlite3 *handle = NULL;
         int type = 0;
