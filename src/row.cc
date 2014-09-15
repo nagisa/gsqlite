@@ -16,6 +16,7 @@ Row::~Row()
 size_t
 Row::columns()
 {
+    this->ensure_valid();
     return this->values.size();
 }
 
