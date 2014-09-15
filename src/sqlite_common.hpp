@@ -1,5 +1,4 @@
-#ifndef _GSQLITE_SQLITE_COMMON
-#define _GSQLITE_SQLITE_COMMON
+#pragma once
 
 #include <exception>
 #include <functional>

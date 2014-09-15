@@ -1,5 +1,4 @@
-#ifndef _GSQLITE_CONNECTION
-#define _GSQLITE_CONNECTION
+#pragma once
 
 #include <sqlite3.h>
 #include <queue>
@@ -41,6 +40,3 @@ class Connection : public Showable {
         void worker();
         void add_job(jobfn_t);
 };
-
-
-#endif

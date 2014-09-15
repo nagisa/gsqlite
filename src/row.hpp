@@ -1,5 +1,4 @@
-#ifndef _GSQLITE_ROW
-#define _GSQLITE_ROW
+#pragma once
 
 #include <vector>
 
@@ -21,6 +20,3 @@ class Row : public Showable {
         bool invalid = false;
         void ensure_valid();
 };
-
-
-#endif

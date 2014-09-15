@@ -1,5 +1,4 @@
-#ifndef _GSQLITE_IFACES
-#define _GSQLITE_IFACES
+#pragma once
 
 #include <string>
 
@@ -21,5 +20,3 @@ class Conditionable {
         virtual bool operator!() = 0;
         virtual operator void*() = 0;
 };
-
-#endif

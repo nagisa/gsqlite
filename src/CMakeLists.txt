@@ -16,7 +16,7 @@ include_directories(${GTKMM_INCLUDE_DIRS})
 
 set(ALL_LIBRARIES ${SQLITE} gsqlitel ${GTKMM_LIBRARIES})
 
-add_library(gsqlitel STATIC gsqlite interfaces connection sqlite_common statement row)
+add_library(gsqlitel STATIC gsqlite interfaces connection sqlite_common statement row value)
 add_executable(gsqlite gsqlite.cc)
 target_link_libraries(gsqlite ${ALL_LIBRARIES})
 

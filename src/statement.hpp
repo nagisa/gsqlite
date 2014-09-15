@@ -1,5 +1,4 @@
-#ifndef _GSQLITE_STATEMENT
-#define _GSQLITE_STATEMENT
+#pragma once
 
 #include <future>
 
@@ -33,5 +32,3 @@ class Statement : public Showable {
         std::weak_ptr<Row> last_row;
         std::function<void (jobfn_t)> schedule_fn;
 };
-
-#endif
