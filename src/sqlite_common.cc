@@ -17,8 +17,8 @@ SQLiteException::what() const throw()
             return "query is empty or miscellaneous error has occurred";
         case _SQLITE_ROW_ERR:
             return "row initialized without values";
-        case _SQLITE_INVALID_ROW:
-            return "row is invalid";
+        case _SQLITE_NULL_EXTRACT:
+            return "extract of null column";
         default:
             return "unknown error";
     }

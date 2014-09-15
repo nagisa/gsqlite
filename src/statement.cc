@@ -24,10 +24,12 @@ Statement::show()
     return ss.str();
 }
 
-std::vector<sqlite3_value *> collect_cols(int cols, sqlite3_stmt* stmt){
-    std::vector<sqlite3_value *> vec(cols);
+std::vector<std::unique_ptr<Value>> collect_cols(int cols, sqlite3_stmt* stmt){
+    std::vector<std::unique_ptr<Value>> vec(cols);
     for(int i = 0; i < cols; i += 1){
-        vec[i] = sqlite3_column_value(stmt, i);
+        vec[i] = std::unique_ptr<Value>(
+            mkValue(sqlite3_column_value(stmt, i))
+        );
     }
     return vec;
 }
@@ -35,8 +37,10 @@ std::vector<sqlite3_value *> collect_cols(int cols, sqlite3_stmt* stmt){
 std::future<std::shared_ptr<Row>>
 Statement::next()
 {
-    auto promise = new std::promise<std::shared_ptr<Row>>;
+    // Invalidate previous row, if any.
     if(!this->last_row.expired()){{ this->last_row.lock()->invalidate(); }}
+
+    auto promise = new std::promise<std::shared_ptr<Row>>;
     this->schedule_fn([&, promise](){
         try {
             int ret = SQLITE_BUSY;
