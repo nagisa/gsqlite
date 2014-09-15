@@ -25,4 +25,5 @@ class SQLiteException : public std::exception, public Showable {
 // Custom error codes
 #define _SQLITE_NULL_STMT -1
 #define _SQLITE_ROW_ERR -2
+#define _SQLITE_VALUE_TYPE -3
 #define _SQLITE_NULL_EXTRACT -4
