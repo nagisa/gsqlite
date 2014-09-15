@@ -22,10 +22,17 @@ int main(void){
         std::cerr << "column count != 1" << std::endl;
         return 1;
     }
-    if(row->extract<int64_t>(0) != 42) {
-        std::cerr << "extract gives incorrect results" << std::endl;
+
+    future = s->next();
+    future.wait();
+    std::cout << row->show() << std::endl;
+
+    try{
+        row->columns();
+        std::cerr << "row is not invalidated properly" << std::endl;
         return 1;
-    }
+    } catch (std::logic_error& e) {}
+
     }
     return 0;
 }
