@@ -9,7 +9,6 @@ Statement::Statement(std::function<void (jobfn_t)> sched, sqlite3_stmt *stmt)
         throw SQLiteException(_SQLITE_NULL_STMT);
     }
     this->statement = stmt;
-
     this->schedule_fn = sched;
 }
 
@@ -40,8 +39,8 @@ std::future<std::shared_ptr<Row>>
 Statement::next()
 {
     // Invalidate previous row, if any.
-    if(!this->last_row.expired()){
-        this->last_row.lock()->invalidate();
+    if(auto last_row = this->last_row.lock()){
+        last_row->invalidate();
     }
 
     auto promise = new std::promise<std::shared_ptr<Row>>;
