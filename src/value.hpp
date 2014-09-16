@@ -2,9 +2,10 @@
 #include <cinttypes>
 #include "sqlite_common.hpp"
 
-class Value {
+/// Interface which makes polymorphism possible between different types of
+/// SQL values.
+class Value : public Showable {
     public:
-        Value(){};
         virtual ~Value(){};
         virtual int getType() = 0;
 };
@@ -14,8 +15,9 @@ class name : public derive {\
     public:\
         name(sqlite3_value *);\
         virtual ~name();\
-        virtual int getType() { return (type_enum); };\
+        int getType() override { return (type_enum); };\
         virtual type operator*() { return this->value; }; \
+        std::string show() override { return #name"()"; }; \
     private:\
         type value; \
 }

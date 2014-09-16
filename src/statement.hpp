@@ -23,7 +23,6 @@ class Statement : public Showable {
         /// Will throw an exception when there’s no more results as well as
         /// when an error occurs. Call to next() invalidates any Row object
         /// retrieved by this Statement.
-        // TODO: ensure that invalidated row cannot be used.
         std::future<std::shared_ptr<Row>> next();
 
         std::string show() override;
