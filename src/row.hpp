@@ -36,10 +36,10 @@ class Row : public Showable {
         /// Warning: bounds are not checked, indexing over bounds is undefined.
         template<typename T> T extract(size_t n);
 
+        /// Make unable to use this row again.
         void invalidate();
 
         std::string show() override;
-
     private:
         void ensure_valid();
 };

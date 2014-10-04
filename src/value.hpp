@@ -7,6 +7,10 @@
 class Value : public Showable {
     public:
         virtual ~Value(){};
+
+        /// Get the type of value object. This method should return one of
+        /// the fundamental SQLite type enumeration values. See
+        /// http://www.sqlite.org/c3ref/c_blob.html
         virtual int getType() = 0;
 };
 

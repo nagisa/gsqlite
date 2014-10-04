@@ -17,7 +17,6 @@ class Connection : public Showable {
     private:
         sqlite3 *handle = NULL;
         int type = 0;
-        // TODO: Probably should be abstracted out to a struct or something.
         Glib::Threads::Mutex   queue_mtx;
         Glib::Threads::Cond    queue_push;
         Glib::Threads::Thread *thread;
@@ -30,11 +29,19 @@ class Connection : public Showable {
         Connection(const char *filename, int flags, const char *zVfs);
         ~Connection();
 
+        /// Prepare a Statement on an open SQLite database.
+        /// See: www.sqlite.org/c3ref/prepare.html
         Statement* prepare(const char *query, int nByte = -1,
                            const char **tail = NULL);
+        /// Prepare a Statement on an open SQLite database.
+        /// See: www.sqlite.org/c3ref/prepare.html
         Statement* prepare(const char *query, const char **tail);
+        /// Prepare a Statement on an open SQLite database.
+        /// See: www.sqlite.org/c3ref/prepare.html
         Statement* prepare16(const char *query, int nByte = -1,
                              const char **tail = NULL);
+        /// Prepare a Statement on an open SQLite database.
+        /// See: www.sqlite.org/c3ref/prepare.html
         Statement* prepare16(const char *query, const char **tail);
 
         std::string show() override;
