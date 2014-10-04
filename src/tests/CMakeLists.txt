@@ -7,6 +7,7 @@ macro("test_it" n)
     add_test(NAME ${n} COMMAND ${n})
 endmacro("test_it")
 
+test_it(testing)
 test_it(connection1)
 test_it(connection2)
 test_it(connection_prepare1)

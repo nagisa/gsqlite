@@ -1,9 +1,9 @@
-#include <iostream>
 #include <memory>
 #include <unistd.h>
 
 #include "../connection.hpp"
 #include "../row.hpp"
+#include "testing.hpp"
 
 int main(void){
     std::unique_ptr<Connection> c(new Connection(":memory:"));
@@ -11,22 +11,17 @@ int main(void){
     {
     auto future = s->next();
     future.wait();
-    if(!future.valid()){
-        return 1;
-    }
+    SHOULD("future is valid after wait",
+           future.valid());
     auto row = future.get();
-
-    if(row->columns() != 1){
-        return 1;
-    }
+    SHOULD("row should have 1 column",
+           row->columns() == 1);
 
     future = s->next();
     future.wait();
-
-    try{
-        row->columns();
-        return 1;
-    } catch (std::logic_error& e) {}
-    }
+    SHOULD_THROW("row should be invalid after next() on statement",
+                 std::logic_error,
+                 { row->columns(); });
     return 0;
+    }
 }

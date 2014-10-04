@@ -1,10 +1,10 @@
-#include <iostream>
 #include <memory>
 #include <algorithm>
 #include <unistd.h>
 
 #include "../connection.hpp"
 #include "../row.hpp"
+#include "testing.hpp"
 
 // It should be possible to have multiple statements active at the same time.
 int main(void){
@@ -25,13 +25,18 @@ int main(void){
     auto index = 0;
     for(auto el = futures.begin(); el != futures.end(); el++, index++){
         el->wait();
+
+        // Should not throw
         auto row = el->get();
         row->extract<int64_t>(0);
         row->extract<double>(2);
-        if((index != 1 && (*row)[1] != nullptr) ||
-           (index == 1  && (*row)[1] == nullptr)){
-            return 1;
-        }
+
+        if(index == 1)
+            SHOULD("second column in second statement is non-null",
+                  (*row)[1] != nullptr)
+        else
+            SHOULD("second column in non-second statement are null",
+                   (*row)[1] == nullptr)
     }
     }
 

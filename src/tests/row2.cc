@@ -1,10 +1,10 @@
-#include <iostream>
 #include <memory>
 #include <cmath>
 #include <unistd.h>
 
 #include "../connection.hpp"
 #include "../row.hpp"
+#include "testing.hpp"
 
 // Tests variety of extract and operator[] function combinations.
 int main(void){
@@ -15,37 +15,21 @@ int main(void){
     future.wait();
     auto row = future.get();
 
-    std::cout << row->show() << std::endl;
-    if(row->columns() != 3){
-        std::cerr << "column count != 3" << std::endl;
-        return 1;
-    }
+    SHOULD("column count is 3",
+           row->columns() == 3);
+    SHOULD("first column is int equal to 42",
+           row->extract<int64_t>(0) == 42);
+    SHOULD("second column is close to pi",
+           std::fabs(row->extract<double>(2) - 3.1415926535) < 1E-6L);
 
-    if(row->extract<int64_t>(0) != 42) {
-        std::cerr << "extract gives incorrect results" << std::endl;
-        return 1;
-    }
+    SHOULD_THROW("extract with invalid type should fail",
+                 SQLiteException,
+                 { row->extract<const void *>(1); });
 
-    if(std::fabs(row->extract<double>(2) - 3.1415926535) > 1E-6L) {
-        std::cerr << "extract gives incorrect results" << std::endl;
-        return 1;
-    }
-
-    try {
-        row->extract<const void *>(1);
-        std::cerr << "extract does not throw on NULL" << std::endl;
-        return 1;
-    } catch (SQLiteException& e) { }
-
-    if((*row)[1] != nullptr) {
-        std::cerr << "get does not return nullptr" << std::endl;
-        return 1;
-    }
-
-    if((*row)[2] == nullptr) {
-        std::cerr << "get fails on non-null" << std::endl;
-        return 1;
-    }
+    SHOULD("get return nullptr on NULL",
+           (*row)[1] == nullptr);
+    SHOULD("get return non-nullptr on non-NULL",
+           (*row)[2] != nullptr);
     }
 
     return 0;

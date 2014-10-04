@@ -1,17 +1,14 @@
-#include <iostream>
 #include <memory>
 
 #include "../connection.hpp"
+#include "testing.hpp"
 
 int main(void){
     std::unique_ptr<Connection> c(new Connection(":memory:"));
 
-    try {
-        c->prepare("");
-    } catch (SQLiteException& e){
-        return 0;
-    }
+    SHOULD_THROW("preparation of empty query should fail",
+                 SQLiteException,
+                 { c->prepare(""); });
 
-    std::cerr << "Preparation of empty query did not fail" << std::endl;
-    return 1;
+    return 0;
 }
