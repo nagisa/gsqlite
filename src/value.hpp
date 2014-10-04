@@ -12,14 +12,14 @@ class Value : public Showable {
 
 #define GEN_VALUE(name, derive, type_enum, type) \
 class name : public derive {\
+    private:\
+        type value;\
     public:\
         name(sqlite3_value *);\
         virtual ~name();\
         int getType() override { return (type_enum); };\
         virtual type operator*() { return this->value; }; \
         std::string show() override { return #name"()"; }; \
-    private:\
-        type value; \
 }
 
 GEN_VALUE(IntValue, Value, SQLITE_INTEGER, int64_t);

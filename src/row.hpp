@@ -7,6 +7,10 @@
 #include "value.hpp"
 
 class Row : public Showable {
+    private:
+        std::vector<std::unique_ptr<Value>> values;
+        bool invalid_ = false;
+
     public:
         Row(std::vector<std::unique_ptr<Value>>);
         ~Row();
@@ -35,9 +39,7 @@ class Row : public Showable {
         void invalidate();
 
         std::string show() override;
-    private:
-        std::vector<std::unique_ptr<Value>> values;
 
-        bool invalid_ = false;
+    private:
         void ensure_valid();
 };
