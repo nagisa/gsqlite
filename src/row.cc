@@ -5,7 +5,9 @@
 
 Row::Row(std::vector<std::unique_ptr<Value>> values)
 {
-    if(values.empty()) throw SQLiteException(_SQLITE_ROW_ERR);
+    if(values.empty()){
+        throw SQLiteException(_SQLITE_ROW_ERR);
+    }
     this->values = std::move(values);
 }
 
@@ -28,12 +30,15 @@ Row::operator[](size_t n)
 };
 
 #define GENERATE_EXTRACT(type, index) {\
-    auto ptr = (*this)[(index)]; \
-    if(ptr == nullptr) throw SQLiteException(_SQLITE_NULL_EXTRACT); \
-    auto res = dynamic_cast<type>(ptr); \
-    if(res == nullptr) throw std::bad_cast(); \
-    return **res; \
+    auto ptr = (*this)[(index)];\
+    if(ptr == nullptr)\
+        throw SQLiteException(_SQLITE_NULL_EXTRACT);\
+    auto res = dynamic_cast<type>(ptr);\
+    if(res == nullptr)\
+        throw std::bad_cast();\
+    return **res;\
 }
+
 template<> int64_t
 Row::extract(size_t n)
 {
@@ -57,6 +62,7 @@ Row::extract(size_t n)
 {
     GENERATE_EXTRACT(TextValue *, n);
 }
+
 #undef GENERATE_EXTRACT
 
 void
@@ -68,7 +74,8 @@ Row::invalidate()
 void
 Row::ensure_valid()
 {
-    if(this->invalid_) throw std::logic_error(INVALID_WHAT);
+    if(this->invalid_)
+        throw std::logic_error(INVALID_WHAT);
 }
 
 std::string
@@ -76,6 +83,8 @@ Row::show()
 {
     std::stringstream ss;
     ss << "Row(" << &this->values << ")";
-    if(this->invalid_) ss << "::invalid";
+    if(this->invalid_){
+        ss << "::invalid";
+    }
     return ss.str();
 }

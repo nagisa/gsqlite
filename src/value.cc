@@ -52,11 +52,17 @@ Value *
 mkValue(sqlite3_value *val)
 {
     switch(sqlite3_value_type(val)){
-        case SQLITE_NULL: return nullptr;
-        case SQLITE_INTEGER: return new IntValue(val);
-        case SQLITE_FLOAT: return new FloatValue(val);
-        case SQLITE_BLOB: return new BlobValue(val);
-        case SQLITE_TEXT: return new TextValue(val);
-        default: return nullptr;
+        case SQLITE_NULL:
+            return nullptr;
+        case SQLITE_INTEGER:
+            return new IntValue(val);
+        case SQLITE_FLOAT:
+            return new FloatValue(val);
+        case SQLITE_BLOB:
+            return new BlobValue(val);
+        case SQLITE_TEXT:
+            return new TextValue(val);
+        default:
+            return nullptr;
     }
 }

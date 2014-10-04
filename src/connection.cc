@@ -25,11 +25,14 @@ Connection::Connection(const char *filename, int flags, const char *zVfs)
 
 Connection::~Connection()
 {
-    int ret;
+    int ret = SQLITE_ERROR;
     this->add_job([](){ throw Glib::Threads::Thread::Exit(); });
     this->thread->join();
-    if(this->type == 1) ret = sqlite3_close(this->handle);
-    if(this->type == 2) ret = sqlite3_close_v2(this->handle);
+    if(this->type == 1){
+        ret = sqlite3_close(this->handle);
+    } else if(this->type == 2){
+        ret = sqlite3_close_v2(this->handle);
+    }
     if(ret != SQLITE_OK) {
         throw SQLiteException(ret);
         // TODO: Well, dang. Apparently one should never throw from destructors.
@@ -51,7 +54,9 @@ Statement *
 Connection::prepare(const char *query, int nByte, const char **tail){
     sqlite3_stmt *stmt;
     int err = sqlite3_prepare_v2(this->handle, query, nByte, &stmt, tail);
-    if(err != SQLITE_OK) throw SQLiteException(err);
+    if(err != SQLITE_OK){
+        throw SQLiteException(err);
+    }
     return new Statement([&](jobfn_t job){
         this->add_job(job);
     }, stmt);
@@ -67,7 +72,9 @@ Connection::prepare16(const char *query, int nByte, const char **tail){
     sqlite3_stmt *stmt;
     int err = sqlite3_prepare16_v2(this->handle, query, nByte, &stmt,
                                    reinterpret_cast<const void **>(tail));
-    if(err != SQLITE_OK) throw SQLiteException(err);
+    if(err != SQLITE_OK){
+        throw SQLiteException(err);
+    }
     return new Statement([&](jobfn_t job){
         this->add_job(job);
     }, stmt);
@@ -83,7 +90,9 @@ void Connection::worker(){
         jobfn_t job;
         {
             Glib::Threads::Mutex::Lock lock(this->queue_mtx);
-            while(this->queue.empty()) this->queue_push.wait(this->queue_mtx);
+            while(this->queue.empty()) {
+                this->queue_push.wait(this->queue_mtx);
+            }
             job = this->queue.front();
             this->queue.pop();
         }
