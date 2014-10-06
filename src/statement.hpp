@@ -7,13 +7,12 @@
 
 
 
-/// A single query to a previously opened database.
-
-/// A single query to a previously opened database. This class’ methods are
-/// thread-safe and non-blocking. Construction may throw an exception.
-/// This class is not meaningfully constructable by an end API user. The only
-/// way to retrieve a meaningful instance of the class is through
-/// Connection::prepare.
+/// @brief A query to a previously opened database.
+///
+/// This class’ methods are thread-safe and non-blocking. Construction may
+/// throw an exception.  This class is not meaningfully constructable by an end
+/// API user. The only way to retrieve a meaningful instance of the class is
+/// through Connection::prepare.
 class Statement : public Showable {
     private:
         sqlite3_stmt *statement;

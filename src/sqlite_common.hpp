@@ -9,6 +9,8 @@
 
 typedef std::function<void ()> jobfn_t;
 
+/// @brief Exception used to inform about SQLite errors.
+///
 /// An exception object thrown when underlying SQLite errors occur
 /// (informational) or API misuse which might cause SQLite errors occur
 /// (preventional).
