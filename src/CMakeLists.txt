@@ -14,9 +14,14 @@ pkg_check_modules(GTKMM gtkmm-3.0)
 link_directories(${GTKMM_LIBRARY_DIRS})
 include_directories(${GTKMM_INCLUDE_DIRS})
 
-set(ALL_LIBRARIES ${SQLITE} gsqlitel ${GTKMM_LIBRARIES})
+pkg_check_modules(GLIBMM glibmm-2.4)
+link_directories(${GLIBMM_LIBRARY_DIRS})
+include_directories(${GLIBMM_INCLUDE_DIRS})
 
-add_library(gsqlitel STATIC gsqlite interfaces connection sqlite_common statement row value)
+set(CORE_LIBRARIES ${SQLITE} gsqlitel ${GLIBMM_LIBRARIES})
+set(ALL_LIBRARIES ${CORE_LIBRARIES} ${GTKMM_LIBRARIES})
+
+add_library(gsqlitel STATIC interfaces connection sqlite_common statement row value)
 add_executable(gsqlite gsqlite.cc)
 target_link_libraries(gsqlite ${ALL_LIBRARIES})
 

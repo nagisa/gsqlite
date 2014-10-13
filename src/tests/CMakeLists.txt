@@ -3,7 +3,7 @@ project(gSQLite_tests)
 
 macro("test_it" n)
     add_executable(${n} ${n})
-    target_link_libraries(${n} ${ALL_LIBRARIES})
+    target_link_libraries(${n} ${CORE_LIBRARIES})
     add_test(NAME ${n} COMMAND ${n})
 endmacro("test_it")
 
