@@ -5,7 +5,7 @@
 
 #define SHOULD(description, cond) {{\
     if(!(cond)){\
-        std::cerr << "FAILED SHOULD: " << description << "\n";\
+        std::clog << "FAILED SHOULD: " << description << "\n";\
         return 1;\
     }\
 }}
@@ -17,7 +17,7 @@
         return 1;\
     } catch (exc &e) {\
     } catch (...){\
-        std::cerr << "FAILED SHOULD_THROW: " << desc << ": wrong exception" \
+        std::clog << "FAILED SHOULD_THROW: " << desc << ": wrong exception" \
                << "\n";\
         return 1;\
     }\
