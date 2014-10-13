@@ -19,9 +19,10 @@ link_directories(${GLIBMM_LIBRARY_DIRS})
 include_directories(${GLIBMM_INCLUDE_DIRS})
 
 set(CORE_LIBRARIES ${SQLITE} gsqlitel ${GLIBMM_LIBRARIES})
-set(ALL_LIBRARIES ${CORE_LIBRARIES} ${GTKMM_LIBRARIES})
+set(ALL_LIBRARIES ${CORE_LIBRARIES} gsqliteui ${GTKMM_LIBRARIES})
 
 add_library(gsqlitel STATIC interfaces connection sqlite_common statement row value)
+add_library(gsqliteui STATIC window)
 add_executable(gsqlite gsqlite.cc)
 target_link_libraries(gsqlite ${ALL_LIBRARIES})
 
