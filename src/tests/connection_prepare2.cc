@@ -1,7 +1,7 @@
 #include <iostream>
 #include <memory>
 
-#include "../connection.hpp"
+#include "../connection.hh"
 
 int main(void){
     std::unique_ptr<Connection> c(new Connection(":memory:"));

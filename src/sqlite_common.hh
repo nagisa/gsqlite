@@ -5,7 +5,7 @@
 #include <string>
 #include <sqlite3.h>
 
-#include "interfaces.hpp"
+#include "interfaces.hh"
 
 typedef std::function<void ()> jobfn_t;
 

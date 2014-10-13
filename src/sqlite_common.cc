@@ -1,6 +1,6 @@
 #include <sstream>
 
-#include "sqlite_common.hpp"
+#include "sqlite_common.hh"
 
 SQLiteException::SQLiteException(int code)
 {

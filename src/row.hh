@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 
-#include "sqlite_common.hpp"
+#include "sqlite_common.hh"
 #include "value.hpp"
 
 /// @brief A single result row for a query.

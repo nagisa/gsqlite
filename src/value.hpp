@@ -1,6 +1,6 @@
 #pragma once
 #include <cinttypes>
-#include "sqlite_common.hpp"
+#include "sqlite_common.hh"
 
 /// @brief Objects representing SQLite values.
 class Value : public Showable {

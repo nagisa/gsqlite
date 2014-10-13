@@ -1,5 +1,5 @@
 #include <sstream>
-#include "row.hpp"
+#include "row.hh"
 
 #define INVALID_WHAT "row is invalid"
 

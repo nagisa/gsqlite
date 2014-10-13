@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../connection.hpp"
+#include "../connection.hh"
 
 int main(void){
     // Creation of in-memory database should (almost) always succeed;

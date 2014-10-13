@@ -1,6 +1,6 @@
 #include <memory>
 
-#include "../connection.hpp"
+#include "../connection.hh"
 #include "testing.hpp"
 
 int main(void){

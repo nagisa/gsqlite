@@ -4,9 +4,9 @@
 #include <queue>
 #include <glibmm/threads.h>
 
-#include "interfaces.hpp"
-#include "statement.hpp"
-#include "sqlite_common.hpp"
+#include "interfaces.hh"
+#include "statement.hh"
+#include "sqlite_common.hh"
 
 /// @brief An open database connection.
 ///

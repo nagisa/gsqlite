@@ -2,8 +2,8 @@
 #include <cmath>
 #include <unistd.h>
 
-#include "../connection.hpp"
-#include "../row.hpp"
+#include "../connection.hh"
+#include "../row.hh"
 #include "testing.hpp"
 
 // Tests variety of extract and operator[] function combinations.

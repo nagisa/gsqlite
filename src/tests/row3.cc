@@ -2,8 +2,8 @@
 #include <algorithm>
 #include <unistd.h>
 
-#include "../connection.hpp"
-#include "../row.hpp"
+#include "../connection.hh"
+#include "../row.hh"
 #include "testing.hpp"
 
 // It should be possible to have multiple statements active at the same time.

@@ -2,8 +2,8 @@
 
 #include <future>
 
-#include "sqlite_common.hpp"
-#include "row.hpp"
+#include "sqlite_common.hh"
+#include "row.hh"
 
 
 

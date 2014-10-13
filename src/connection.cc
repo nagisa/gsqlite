@@ -1,6 +1,6 @@
 #include <sstream>
 
-#include "connection.hpp"
+#include "connection.hh"
 
 
 Connection::Connection(const char *filename)

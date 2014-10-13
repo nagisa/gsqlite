@@ -1,7 +1,7 @@
 #include <sstream>
 #include <vector>
 
-#include "statement.hpp"
+#include "statement.hh"
 
 Statement::Statement(std::function<void (jobfn_t)> sched, sqlite3_stmt *stmt)
 {
