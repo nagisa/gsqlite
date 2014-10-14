@@ -1,11 +1,7 @@
 #include <gtkmm/application.h>
 #include <iostream>
 
-#include "window.hh"
-
-namespace sigc {
-    SIGC_FUNCTORS_DEDUCE_RESULT_TYPE_WITH_DECLTYPE
-}
+#include "ui/window.hh"
 
 int main(int argc, char** argv){
     auto app = Gtk::Application::create("org.apps.gSQLite");
