@@ -2,8 +2,8 @@
 
 #include "connection.hh"
 
-
 Connection::Connection(const char *filename)
+    : Glib::ObjectBase(typeid(Connection))
 {
     int ret;
     if((ret = sqlite3_open(filename, &this->handle)) != SQLITE_OK)
@@ -14,6 +14,7 @@ Connection::Connection(const char *filename)
 }
 
 Connection::Connection(const char *filename, int flags, const char *zVfs)
+    : Glib::ObjectBase(typeid(Connection))
 {
     int ret;
     if((ret = sqlite3_open_v2(filename, &this->handle, flags, zVfs)))

@@ -5,7 +5,7 @@
 #include <gtkmm/headerbar.h>
 #include <gtkmm/filechooserdialog.h>
 
-#include "common.hh"
+#include "../sigc_common.hh"
 
 namespace GSQLiteui {
 

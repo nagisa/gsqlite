@@ -3,6 +3,7 @@
 #include <sqlite3.h>
 #include <queue>
 #include <glibmm/threads.h>
+#include <glibmm/object.h>
 
 #include "interfaces.hh"
 #include "statement.hh"
@@ -12,7 +13,7 @@
 ///
 /// This class’ methods are thread-safe and non-blocking (except for
 /// construction and destruction).
-class Connection : public Showable {
+class Connection : public Showable, public Glib::Object {
     private:
         sqlite3 *handle = NULL;
         int type = 0;

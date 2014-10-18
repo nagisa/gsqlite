@@ -1,6 +1,6 @@
 #include <memory>
 #include <algorithm>
-#include <unistd.h>
+#include <giomm.h>
 
 #include "../connection.hh"
 #include "../row.hh"
@@ -8,6 +8,7 @@
 
 // It should be possible to have multiple statements active at the same time.
 int main(void){
+    Gio::init();
     std::unique_ptr<Connection> c(new Connection(":memory:"));
 
     std::vector<std::unique_ptr<Statement>> s(3);
@@ -16,28 +17,39 @@ int main(void){
     s[2].reset(c->prepare("SELECT 0, NULL, 0.0;"));
 
     {
-    std::vector<std::future<std::shared_ptr<Row>>> futures;
+    std::vector<Statement::result_t> futures;
 
-    for(auto st = s.begin(); st != s.end(); st++) {
-        futures.push_back(std::move((*st)->next()));
+    int index = 0;
+    int tested = 0;
+    for(auto st = s.begin(); st != s.end(); st++, index++) {
+        auto row = (*st)->next();
+        row->monitor([row, index, &tested](Row::state_t s){
+            SHOULD("row is RESOLVED",
+                   s == Row::RESOLVED)
+
+            // Should not throw
+            row->extract<int64_t>(0);
+            row->extract<double>(2);
+
+            if(index == 1)
+                SHOULD("second column in second statement is non-null",
+                       row->operator[](1) != nullptr)
+            else
+                SHOULD("second column in non-second statement are null",
+                       row->operator[](1) == nullptr)
+            tested++;
+            return false;
+        });
+        futures.push_back(row);
     }
 
-    auto index = 0;
-    for(auto el = futures.begin(); el != futures.end(); el++, index++){
-        el->wait();
+    auto mainloop = Glib::MainLoop::create(false);
+    auto ctx = mainloop->get_context();
 
-        // Should not throw
-        auto row = el->get();
-        row->extract<int64_t>(0);
-        row->extract<double>(2);
-
-        if(index == 1)
-            SHOULD("second column in second statement is non-null",
-                  (*row)[1] != nullptr)
-        else
-            SHOULD("second column in non-second statement are null",
-                   (*row)[1] == nullptr)
+    while(tested != 3){
+        ctx->iteration(false);
     }
+    while(ctx->pending()) ctx->iteration(false);
     }
 
     return 0;

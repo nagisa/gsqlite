@@ -1,5 +1,6 @@
 #include <sstream>
 #include <vector>
+#include <utility>
 
 #include "statement.hh"
 
@@ -35,43 +36,32 @@ std::vector<std::unique_ptr<Value>> collect_cols(int cols, sqlite3_stmt* stmt){
     return vec;
 }
 
-std::future<std::shared_ptr<Row>>
+Statement::result_t
 Statement::next()
 {
-    // Invalidate previous row, if any.
-    if(auto last_row = this->last_row.lock()){
-        last_row->invalidate();
-    }
-
-    auto promise = new std::promise<std::shared_ptr<Row>>;
-    this->schedule_fn([&, promise](){
+    Statement::result_t res(new Row());
+    this->schedule_fn([this, res](){
+        int ret = SQLITE_BUSY;
+        while((ret = sqlite3_step(this->statement)) == SQLITE_BUSY);
         try {
-            int ret = SQLITE_BUSY;
-            while((ret = sqlite3_step(this->statement)) == SQLITE_BUSY);
-            switch(ret) {
-                case SQLITE_DONE:
-                    throw std::future_error(std::future_errc::broken_promise);
-                    break;
-                case SQLITE_ROW:
-                    {
-                    const int cols = sqlite3_column_count(this->statement);
-                    auto vals = collect_cols(cols, this->statement);
-                    auto row = std::make_shared<Row>(std::move(vals));
-                    this->last_row = row;
-                    promise->set_value(row);
-                    }
-                    break;
-                default:
-                    throw SQLiteException(ret);
-                    break;
-            }
-        } catch (...) {
-            try {
-                promise->set_exception(std::current_exception());
-            } catch (...) {}
+        switch(ret) {
+            case SQLITE_DONE:
+                res->set_property("state", Row::DONE);
+                break;
+            case SQLITE_ROW:
+                {
+                const int cols = sqlite3_column_count(this->statement);
+                auto vals = collect_cols(cols, this->statement);
+                res->resolve(std::move(vals));
+                }
+                break;
+            default:
+                throw SQLiteException(ret);
+                break;
         }
-        delete promise;
+        } catch (...) {
+            res->fail(std::current_exception());
+        }
     });
-    auto future = promise->get_future();
-    return future;
+    return res;
 }

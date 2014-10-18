@@ -10,6 +10,13 @@ set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -flto")
 find_package(PkgConfig)
 find_library(SQLITE sqlite3 REQUIRED)
 
+find_package(Threads REQUIRED)
+
+# set(Boost_USE_STATIC_LIBS ON)
+# find_package(Boost COMPONENTS system thread REQUIRED)
+# link_directories(${Boost_LIBRARY_DIR})
+# include_directories(${Boost_INCLUDE_DIR})
+
 pkg_check_modules(GTKMM gtkmm-3.0)
 link_directories(${GTKMM_LIBRARY_DIRS})
 include_directories(${GTKMM_INCLUDE_DIRS})
@@ -18,8 +25,12 @@ pkg_check_modules(GLIBMM glibmm-2.4)
 link_directories(${GLIBMM_LIBRARY_DIRS})
 include_directories(${GLIBMM_INCLUDE_DIRS})
 
-set(CORE_LIBRARIES ${SQLITE} gsqlitel ${GLIBMM_LIBRARIES})
-set(ALL_LIBRARIES ${CORE_LIBRARIES} gsqliteui ${GTKMM_LIBRARIES})
+pkg_check_modules(GIOMM giomm-2.4)
+link_directories(${GIOMM_LIBRARY_DIRS})
+include_directories(${GIOMM_INCLUDE_DIRS})
+
+set(CORE_LIBRARIES gsqlitel ${SQLITE} ${GLIBMM_LIBRARIES} ${GIOMM_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+set(ALL_LIBRARIES gsqliteui ${CORE_LIBRARIES} ${GTKMM_LIBRARIES})
 
 add_library(gsqlitel STATIC interfaces connection sqlite_common statement row value)
 add_executable(gsqlite gsqlite.cc)

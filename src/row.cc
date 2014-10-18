@@ -1,9 +1,23 @@
 #include <sstream>
 #include "row.hh"
+#include "sigc_common.hh"
 
-#define INVALID_WHAT "row is invalid"
+#define INVALID_WHAT "row is not resolved yet"
 
-Row::Row(std::vector<std::unique_ptr<Value>> values)
+Glib::PropertyProxy_ReadOnly<Row::state_t>
+Row::state(){
+    return Glib::PropertyProxy_ReadOnly<Row::state_t>(this, "state");
+}
+
+Row::Row()
+    : Glib::ObjectBase(typeid(Row))
+    , Glib::Object()
+    , _exception(*this, "exception", nullptr)
+    , _state(*this, "state", PRISTINE)
+{
+};
+
+Row::Row(Row::values_t values) : Row()
 {
     if(values.empty()){
         throw SQLiteException(_SQLITE_ROW_ERR);
@@ -18,14 +32,14 @@ Row::~Row()
 size_t
 Row::columns()
 {
-    this->ensure_valid();
+    this->ensure_resolved();
     return this->values.size();
 }
 
 Value *
 Row::operator[](size_t n)
 {
-    this->ensure_valid();
+    this->ensure_resolved();
     return this->values[n].get();
 };
 
@@ -65,16 +79,11 @@ Row::extract(size_t n)
 
 #undef GENERATE_EXTRACT
 
+#include <iostream>
 void
-Row::invalidate()
+Row::ensure_resolved()
 {
-    this->invalid_ = true;
-}
-
-void
-Row::ensure_valid()
-{
-    if(this->invalid_)
+    if(this->_state.get_value() != RESOLVED)
         throw std::logic_error(INVALID_WHAT);
 }
 
@@ -83,8 +92,59 @@ Row::show()
 {
     std::stringstream ss;
     ss << "Row(" << &this->values << ")";
-    if(this->invalid_){
-        ss << "::invalid";
+    switch(this->_state.get_value()) {
+        case PRISTINE:
+            ss << "::pristine";
+            break;
+        case FAILED:
+            ss << "::failed";
+            break;
+        case DONE:
+            ss << "::done";
+            break;
+        default:
+            break;
     }
     return ss.str();
+}
+
+void
+Row::resolve(Row::values_t vals)
+{
+    if(vals.empty()){
+        throw SQLiteException(_SQLITE_ROW_ERR);
+    }
+    this->freeze_notify();
+    if(this->_state.get_value() != Row::PRISTINE)
+        throw std::logic_error("row not pristine anymore");
+    this->values = std::move(vals);
+    this->_state.set_value(Row::RESOLVED);
+    Glib::signal_idle().connect([&](){
+        this->thaw_notify();
+        return false;
+    });
+}
+
+void
+Row::fail(std::exception_ptr p)
+{
+    this->freeze_notify();
+    this->_exception.set_value(p);
+    this->_state.set_value(Row::FAILED);
+    Glib::signal_idle().connect([&](){
+        this->thaw_notify();
+        return false;
+    });
+}
+
+void
+Row::monitor(Row::monitor_fn_t fn)
+{
+    auto cc = new sigc::connection;
+    auto c = this->state().signal_changed().connect([this, fn, cc](){
+        auto ret = fn(this->_state.get_value());
+        if(!ret) cc->disconnect();
+        delete cc;
+    });
+    *cc = c;
 }
