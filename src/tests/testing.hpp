@@ -1,12 +1,12 @@
-
 #include<iostream>
 #include<ostream>
 #include<fstream>
+#include<cstdlib>
 
 #define SHOULD(description, cond) {{\
     if(!(cond)){\
         std::clog << "FAILED SHOULD: " << description << "\n";\
-        return 1;\
+        std::exit(EXIT_FAILURE);\
     }\
 }}
 
@@ -14,11 +14,11 @@
     try{\
         code;\
         std::cerr << "FAILED SHOULD_THROW: " << desc << "\n";\
-        return 1;\
+        std::exit(EXIT_FAILURE);\
     } catch (exc &e) {\
     } catch (...){\
         std::clog << "FAILED SHOULD_THROW: " << desc << ": wrong exception" \
                << "\n";\
-        return 1;\
+        std::exit(EXIT_FAILURE);\
     }\
 }}
