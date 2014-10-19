@@ -37,6 +37,9 @@ Window::Window()
 
 Window::~Window()
 {
+    auto cnn = this->connection.get_value();
+    this->connection.set_value(nullptr);
+    if(cnn != nullptr) delete cnn;
 };
 
 void
