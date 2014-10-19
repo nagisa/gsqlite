@@ -51,6 +51,10 @@ class Row : public Showable, public Glib::Object {
         /// 3. (std::logic_error) row is invalid.
         ///
         /// Warning: bounds are not checked, indexing over bounds is undefined.
+        ///
+        /// Warning: variants of extract which return a pointer (non-POD)
+        /// don’t copy, therefore extracted data will only live as long
+        /// as Row from which the value is extracted.
         template<typename T> T extract(size_t n);
 
         /// Resolve the Row with values_t.

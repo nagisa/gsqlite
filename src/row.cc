@@ -79,7 +79,6 @@ Row::extract(size_t n)
 
 #undef GENERATE_EXTRACT
 
-#include <iostream>
 void
 Row::ensure_resolved()
 {

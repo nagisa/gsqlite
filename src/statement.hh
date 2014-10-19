@@ -32,12 +32,15 @@ class Statement : public Showable {
         result_t next();
 
         /// A convenience function to iterate through all the rows calling
-        /// the callback for each row. Row is guaranteed to be already resolved
+        /// the callback for each row. Row is guaranteed to be non-pristine
         /// inside the callback. If callback returns false, iteration is halted
         /// and subsequent call to iterate() or next() will return row after
-        /// the point where the iteration was last halted.
+        /// the point where the iteration was last halted. Iteration will also
+        /// be halted if Row with Row::status() != Row::RESOLVED is
+        /// encountered.
         ///
-        /// Does not block.
+        /// Does not block. All callbacks will be invoked in thread which runs
+        /// Glib::MainLoop.
         void iterate(std::function<bool (result_t)>);
 
         std::string show() override;

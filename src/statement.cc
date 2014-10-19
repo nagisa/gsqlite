@@ -65,3 +65,21 @@ Statement::next()
     });
     return res;
 }
+
+void
+Statement::iterate(std::function<bool (result_t)> cb){
+    result_t row = this->next();
+    auto cb1 = [this, cb](Row::state_t s, result_t row){
+        bool ret = cb(row);
+        if(ret == false) return false;
+        if(s != Row::RESOLVED) return false;
+        this->iterate(cb);
+        return false;
+    };
+    row->monitor([row, cb1](Row::state_t s){
+        Glib::signal_idle().connect_once([s, cb1, row](){
+            cb1(s, row);
+        });
+        return false;
+    });
+}
