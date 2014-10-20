@@ -5,7 +5,7 @@
 using namespace GSQLiteui;
 
 Window::Window()
-    : Glib::ObjectBase(typeid(Window))
+    : Glib::ObjectBase("gsqlite_Window")
     , Gtk::ApplicationWindow()
     , database_file(*this, "database-file")
     , connection(*this, "connection")
@@ -14,10 +14,8 @@ Window::Window()
     this->primary_button.set_label("Open");
     this->primary_button.get_style_context()->add_class("suggested-action");
     this->header.pack_start(this->primary_button);
-    this->add(this->paned);
-    this->paned.add1(this->table_scrolled);
-    this->table_scrolled.add(this->table_view);
-    this->paned.add2(this->button);
+    this->add(this->stack);
+    // this->stack.add(this->table_view);
 
     this->primary_button.signal_clicked().connect([&](){
         this->open_file_dialog();
@@ -27,9 +25,12 @@ Window::Window()
         this->reconnect();
     });
     this->connection.get_proxy().signal_changed().connect([&](){
-        auto cnn = this->connection.get_value();
-        if(cnn != nullptr)
-            this->table_view.refresh(*cnn);
+        if(this->tables)
+            this->stack.remove(*this->tables);
+        this->tables.reset(new GSQLiteui::TableView(this->connection.get_value()));
+        this->tables->show_all();
+        this->stack.add(*this->tables, "tables", "Tables");
+        this->stack.set_visible_child(*this->tables);
     });
 
     this->update_header();
@@ -37,9 +38,6 @@ Window::Window()
 
 Window::~Window()
 {
-    auto cnn = this->connection.get_value();
-    this->connection.set_value(nullptr);
-    if(cnn != nullptr) delete cnn;
 };
 
 void
@@ -74,17 +72,15 @@ void
 Window::reconnect()
 {
     auto fname = this->database_file.get_value()->get_path();
-    auto old = this->connection.get_value();
-    auto cnn = new Connection(fname.c_str());
-    this->connection = cnn;
-    if(old != nullptr)
-        delete old;
+    {
+    std::shared_ptr<Connection> cnn(new Connection(fname.c_str()));
+    this->connection.set_value(cnn);
+    }
 }
 
-
-
 OpenDatabaseDialog::OpenDatabaseDialog(Gtk::Window &w)
-    : Gtk::FileChooserDialog(w, "Pick a SQLite file")
+    : Glib::ObjectBase("gsqlite_OpenDatabaseDialog")
+    , Gtk::FileChooserDialog(w, "Pick a SQLite file")
 {
     this->add_button("Cancel", Gtk::RESPONSE_REJECT);
     this->add_button("Open", Gtk::RESPONSE_ACCEPT);

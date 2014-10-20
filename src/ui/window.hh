@@ -11,16 +11,16 @@ namespace GSQLiteui {
 
 /// Main application window
 class Window : public Gtk::ApplicationWindow {
-    Gtk::HeaderBar              header;
-    Gtk::Button                 primary_button;
-    Gtk::Paned                  paned;
-    /* List of tables */
-    Gtk::ScrolledWindow         table_scrolled;
-    GSQLiteui::TableView        table_view;
+    // Header
+    Gtk::HeaderBar                        header;
+    Gtk::Button                           primary_button;
+    // Content
+    Gtk::Stack                            stack;
+    std::unique_ptr<GSQLiteui::TableView> tables;
 
-    Gtk::Button                 button;
+    // ETC
     Glib::Property<Glib::RefPtr<Gio::File>> database_file;
-    Glib::Property<Connection*> connection;
+    Glib::Property<std::shared_ptr<Connection>> connection;
 
     void open_file_dialog();
     void update_header();

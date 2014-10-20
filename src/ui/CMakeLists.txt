@@ -4,4 +4,4 @@ project(gSQLite_ui)
 find_package(PkgConfig)
 find_library(SQLITE sqlite3 REQUIRED)
 
-add_library(gsqliteui STATIC window table_view)
+add_library(gsqliteui STATIC window table_view query_result_widget)
