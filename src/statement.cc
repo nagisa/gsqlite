@@ -18,12 +18,16 @@ Statement::~Statement()
     sqlite3_finalize(this->statement);
 }
 
-std::string
-Statement::show()
+int
+Statement::columns()
 {
-    std::stringstream ss;
-    ss << "Statement() for " << sqlite3_sql(this->statement);
-    return ss.str();
+    return sqlite3_column_count(this->statement);
+}
+
+const char *
+Statement::origin_name(int n)
+{
+    return sqlite3_column_origin_name(this->statement, n);
 }
 
 std::vector<std::unique_ptr<Value>> collect_cols(int cols, sqlite3_stmt* stmt){
@@ -50,7 +54,7 @@ Statement::next()
                 break;
             case SQLITE_ROW:
                 {
-                const int cols = sqlite3_column_count(this->statement);
+                const int cols = this->columns();
                 auto vals = collect_cols(cols, this->statement);
                 res->resolve(std::move(vals));
                 }
@@ -82,4 +86,12 @@ Statement::iterate(std::function<bool (result_t)> cb){
         });
         return false;
     });
+}
+
+std::string
+Statement::show()
+{
+    std::stringstream ss;
+    ss << "Statement() for " << sqlite3_sql(this->statement);
+    return ss.str();
 }

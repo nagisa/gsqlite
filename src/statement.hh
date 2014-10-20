@@ -21,6 +21,18 @@ class Statement : public Showable {
         Statement(std::function<void (jobfn_t)>, sqlite3_stmt *);
         ~Statement();
 
+        /// Return the number of columns in the result set returned by the
+        /// prepared statement. This routine returns 0 if the Statement is an
+        /// SQL statement that does not return data (for example an UPDATE).
+        int columns();
+
+        /// Determine the name of table column that is the origin
+        /// of a particular result column in SELECT statement.
+        ///
+        /// @param n result column returned by the query. The left-most column
+        /// is 0.
+        const char *origin_name(int n);
+
         /// Retrieve a next row from the list of query results. Non-blocking.
         /// Will throw an exception when there’s no more results as well as
         /// when an error occurs. Call to next() invalidates any previous Row
