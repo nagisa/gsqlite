@@ -1,4 +1,5 @@
 #include "table_view.hh"
+#include <sstream>
 
 using namespace GSQLiteui;
 
@@ -66,6 +67,7 @@ TableList::signal_table_deselect()
 TableView::TableView(std::shared_ptr<Connection> c)
     : Glib::ObjectBase("gsqlite_TableView")
     , Gtk::Paned()
+    , c(c)
 {
     this->table_list.reset(new GSQLiteui::TableList(*c));
     this->pack2(this->table_contents_sw, true, false);
@@ -74,9 +76,26 @@ TableView::TableView(std::shared_ptr<Connection> c)
                                    Gtk::PolicyType::POLICY_AUTOMATIC);
     this->table_list_sw.add(*this->table_list);
     this->table_list_sw.get_style_context()->add_class("sidebar");
+
     this->table_list->signal_table_select().connect([this](Glib::ustring s){
+        std::stringstream ss;
+        ss << "SELECT * FROM " << s << ";";
+        std::unique_ptr<Statement> stmt;
+        try {
+            stmt.reset(this->c->prepare(ss.str().c_str(), ss.str().length()));
+        } catch (SQLiteException& e) {
+            delete this->table_contents.release();
+            this->table_contents_sw.remove();
+            return;
+        }
+        this->table_contents.reset(new QueryResultsWidget(std::move(stmt)));
+        this->table_contents_sw.remove();
+        this->table_contents_sw.add(*this->table_contents);
+        this->table_contents->show_all();
     });
     this->table_list->signal_table_deselect().connect([this](){
+        this->table_contents_sw.remove();
+        delete this->table_contents.release();
     });
 }
 

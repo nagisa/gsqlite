@@ -30,6 +30,18 @@ Statement::origin_name(int n)
     return sqlite3_column_origin_name(this->statement, n);
 }
 
+int
+Statement::column_type(int n)
+{
+    return sqlite3_column_type(this->statement, n);
+}
+
+const char*
+Statement::column_decltype(int n)
+{
+    return sqlite3_column_decltype(this->statement, n);
+}
+
 std::vector<std::unique_ptr<Value>> collect_cols(int cols, sqlite3_stmt* stmt){
     std::vector<std::unique_ptr<Value>> vec(cols);
     for(int i = 0; i < cols; i += 1){

@@ -33,6 +33,18 @@ class Statement : public Showable {
         /// is 0.
         const char *origin_name(int n);
 
+        /// Determine the type of result column.
+        ///
+        /// @param n result column returned by the query. The left-most column
+        /// is 0.
+        int column_type(int n);
+
+        /// Determine the declared type of result column.
+        ///
+        /// @param n result column returned by the query. The left-most column
+        /// is 0.
+        const char* column_decltype(int n);
+
         /// Retrieve a next row from the list of query results. Non-blocking.
         /// Will throw an exception when there’s no more results as well as
         /// when an error occurs. Call to next() invalidates any previous Row

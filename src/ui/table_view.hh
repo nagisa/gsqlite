@@ -22,9 +22,9 @@ class TableList : public Gtk::TreeView {
                 TableListColumnRecord();
         };
 
-        Gtk::TreeIter      previous;
-        table_select_sig_t _signal_table_select;
-        table_deselect_sig_t _signal_table_deselect;
+        Gtk::TreeIter                previous;
+        table_select_sig_t           _signal_table_select;
+        table_deselect_sig_t         _signal_table_deselect;
     public:
         TableListColumnRecord        columns;
         Glib::RefPtr<Gtk::ListStore> store;
@@ -32,12 +32,12 @@ class TableList : public Gtk::TreeView {
         TableList(Connection &);
         ~TableList();
 
-        table_select_sig_t signal_table_select();
-        table_deselect_sig_t signal_table_deselect();
+        table_select_sig_t           signal_table_select();
+        table_deselect_sig_t         signal_table_deselect();
 };
 
 class TableView : public Gtk::Paned {
-    std::shared_ptr<Connection>       c;
+    std::shared_ptr<Connection>                        c;
     public:
         Gtk::ScrolledWindow                            table_list_sw;
         std::unique_ptr<GSQLiteui::TableList>          table_list;
