@@ -12,18 +12,28 @@ namespace GSQLiteui {
 
 /// View for tables in database
 class TableList : public Gtk::TreeView {
+    typedef sigc::signal<void, Glib::ustring> table_select_sig_t;
+    typedef sigc::signal<void>                table_deselect_sig_t;
+
     private:
         class TableListColumnRecord : public Gtk::TreeModel::ColumnRecord {
             public:
                 Gtk::TreeModelColumn<Glib::ustring> table_name;
                 TableListColumnRecord();
         };
+
+        Gtk::TreeIter      previous;
+        table_select_sig_t _signal_table_select;
+        table_deselect_sig_t _signal_table_deselect;
     public:
         TableListColumnRecord        columns;
         Glib::RefPtr<Gtk::ListStore> store;
 
         TableList(Connection &);
         ~TableList();
+
+        table_select_sig_t signal_table_select();
+        table_deselect_sig_t signal_table_deselect();
 };
 
 class TableView : public Gtk::Paned {

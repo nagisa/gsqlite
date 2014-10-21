@@ -33,10 +33,34 @@ TableList::TableList(Connection &c)
         entry->set_value(this->columns.table_name, name);
         return true;
     });
+    this->get_selection()->signal_changed().connect([this](){
+        auto row = this->get_selection()->get_selected();
+        if(!row){
+            this->_signal_table_deselect.emit();
+        }
+        else if(!this->previous || this->previous != row){
+            this->previous = row;
+            this->_signal_table_select.emit(
+                row->get_value(this->columns.table_name)
+            );
+        }
+    });
 }
 
 TableList::~TableList()
 {
+}
+
+TableList::table_select_sig_t
+TableList::signal_table_select()
+{
+    return this->_signal_table_select;
+}
+
+TableList::table_deselect_sig_t
+TableList::signal_table_deselect()
+{
+    return this->_signal_table_deselect;
 }
 
 TableView::TableView(std::shared_ptr<Connection> c)
@@ -50,11 +74,10 @@ TableView::TableView(std::shared_ptr<Connection> c)
                                    Gtk::PolicyType::POLICY_AUTOMATIC);
     this->table_list_sw.add(*this->table_list);
     this->table_list_sw.get_style_context()->add_class("sidebar");
-    // TODO: move to TableLisT
-    // this->table_list->get_selection()->signal_changed().connect([this](){
-    //     this->table_selection_changed();
-    // });
-    // this->table_contents_sw.add(*this->table_contents);
+    this->table_list->signal_table_select().connect([this](Glib::ustring s){
+    });
+    this->table_list->signal_table_deselect().connect([this](){
+    });
 }
 
 TableView::~TableView()
