@@ -40,8 +40,18 @@ QueryResultsWidget::QueryResultsWidget(statement_t&& s)
                         )
                     ));
                     break;
-                default:
-                    iter->set_value(i, Glib::ustring("<not implemented>"));
+                case SQLITE_INTEGER:
+                    iter->set_value(i, Glib::ustring(std::to_string(
+                        **dynamic_cast<IntValue*>(val)
+                    )));
+                    break;
+                case SQLITE_FLOAT:
+                    iter->set_value(i, Glib::ustring(std::to_string(
+                        **dynamic_cast<FloatValue*>(val)
+                    )));
+                    break;
+                case SQLITE_BLOB:
+                    iter->set_value(i, Glib::ustring("<Blob: not implemented>"));
                     break;
             }
         }
