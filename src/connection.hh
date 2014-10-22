@@ -36,6 +36,8 @@ class Connection : public Showable, public Glib::Object {
         /// This function uses v2 interface.
         Connection(const char *filename, int flags, const char *zVfs);
 
+        Connection(const Connection&) = delete;
+
         /// [Close] a Connection to a SQLite database.
         /// [Close]: http://www.sqlite.org/c3ref/close.html
         ///
