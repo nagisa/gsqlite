@@ -9,7 +9,7 @@
 // It should be possible to have multiple statements active at the same time.
 int main(void){
     Gio::init();
-    std::unique_ptr<Connection> c(new Connection(":memory:"));
+    auto c = Connection::create(":memory:");
 
     std::vector<std::unique_ptr<Statement>> s(3);
     s[0].reset(c->prepare("SELECT 42, NULL, 3.1415926535;"));

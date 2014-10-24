@@ -1,9 +1,13 @@
-#include <iostream>
+#include <giomm.h>
 
+#include "testing.hpp"
 #include "../connection.hh"
 
 int main(void){
+    Gio::init();
     // Creation of in-memory database should (almost) always succeed;
-    Connection a(":memory:");
+    auto a = Connection::create(":memory:");
+    SHOULD("Newly created connection should be unique",
+           a.unique());
     return 0;
 }

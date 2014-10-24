@@ -1,16 +1,22 @@
-#include <sstream>
 #include <vector>
 #include <utility>
 
 #include "statement.hh"
 
-Statement::Statement(std::function<void (jobfn_t)> sched, sqlite3_stmt *stmt)
+Statement::Statement(sqlite3_stmt *stmt, schedule_fn_t sched)
+    : Glib::ObjectBase(typeid(Statement))
+    , statement(stmt)
+    , schedule_fn(sched)
 {
-    if(stmt == NULL){
+    if(stmt == NULL)
         throw SQLiteException(_SQLITE_NULL_STMT);
-    }
-    this->statement = stmt;
-    this->schedule_fn = sched;
+}
+
+Statement::Statement(Statement&& o)
+    : statement(std::move(o.statement))
+    , schedule_fn(std::move(o.schedule_fn))
+{
+    o.statement = nullptr;
 }
 
 Statement::~Statement()
@@ -98,12 +104,4 @@ Statement::iterate(std::function<bool (result_t)> cb){
         });
         return false;
     });
-}
-
-std::string
-Statement::show()
-{
-    std::stringstream ss;
-    ss << "Statement() for " << sqlite3_sql(this->statement);
-    return ss.str();
 }

@@ -9,16 +9,20 @@
 /// throw an exception.  This class is not meaningfully constructable by an end
 /// API user. The only way to retrieve a meaningful instance of the class is
 /// through Connection::prepare.
-class Statement : public Showable {
+class Statement : Glib::Object {
     public:
+        typedef std::function<void (jobfn_t)> schedule_fn_t;
         typedef std::shared_ptr<Row> result_t;
+
 
     private:
         sqlite3_stmt *statement;
-        std::function<void (jobfn_t)> schedule_fn;
+        schedule_fn_t schedule_fn;
 
     public:
-        Statement(std::function<void (jobfn_t)>, sqlite3_stmt *);
+        Statement(sqlite3_stmt *, schedule_fn_t);
+        Statement(Statement&&);
+        Statement(const Statement&) = delete;
         ~Statement();
 
         /// Return the number of columns in the result set returned by the
@@ -66,6 +70,4 @@ class Statement : public Showable {
         /// Does not block. All callbacks will be invoked in thread which runs
         /// Glib::MainLoop.
         void iterate(std::function<bool (result_t)>);
-
-        std::string show() override;
 };

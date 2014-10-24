@@ -15,7 +15,6 @@ Window::Window()
     this->primary_button.get_style_context()->add_class("suggested-action");
     this->header.pack_start(this->primary_button);
     this->add(this->stack);
-    // this->stack.add(this->table_view);
 
     this->primary_button.signal_clicked().connect([&](){
         this->open_file_dialog();
@@ -73,8 +72,7 @@ Window::reconnect()
 {
     auto fname = this->database_file.get_value()->get_path();
     {
-    std::shared_ptr<Connection> cnn(new Connection(fname.c_str()));
-    this->connection.set_value(cnn);
+    this->connection.set_value(Connection::create(fname.c_str()));
     }
 }
 

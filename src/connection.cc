@@ -1,39 +1,27 @@
-#include <sstream>
-
 #include "connection.hh"
 
 Connection::Connection(const char *filename)
     : Glib::ObjectBase(typeid(Connection))
 {
-    int ret;
+    int ret = SQLITE_OK;
     if((ret = sqlite3_open(filename, &this->handle)) != SQLITE_OK)
         throw SQLiteException(ret);
-
-    this->thread = Glib::Threads::Thread::create([&](){ this->worker(); });
-    this->type = 1;
-}
-
-Connection::Connection(const char *filename, int flags, const char *zVfs)
-    : Glib::ObjectBase(typeid(Connection))
-{
-    int ret;
-    if((ret = sqlite3_open_v2(filename, &this->handle, flags, zVfs)))
-        throw SQLiteException(ret);
-
-    this->thread = Glib::Threads::Thread::create([&](){ this->worker(); });
-    this->type = 2;
+    this->thread = Glib::Threads::Thread::create([this](){
+        this->worker();
+    });
 }
 
 Connection::~Connection()
 {
     int ret = SQLITE_ERROR;
-    this->add_job([](){ throw Glib::Threads::Thread::Exit(); });
+    // Finalize the worker thread. This makes the destructor
+    // a potentially time intensive task.
+    this->add_job([](){
+        throw Glib::Threads::Thread::Exit();
+    });
     this->thread->join();
-    if(this->type == 1){
-        ret = sqlite3_close(this->handle);
-    } else if(this->type == 2){
-        ret = sqlite3_close_v2(this->handle);
-    }
+
+    ret = sqlite3_close(this->handle);
     if(ret != SQLITE_OK) {
         throw SQLiteException(ret);
         // TODO: Well, dang. Apparently one should never throw from destructors.
@@ -43,57 +31,32 @@ Connection::~Connection()
     this->handle = NULL;
 }
 
-std::string
-Connection::show()
+Statement*
+Connection::prepare(const char *query, int nByte, const char **tail)
 {
-    // Keeping filename around just for this is wasteful;
-    // So we’ll just give away Connection() here.
-    return std::string("Connection()");
-}
-
-Statement *
-Connection::prepare(const char *query, int nByte, const char **tail){
     sqlite3_stmt *stmt;
     int err = sqlite3_prepare_v2(this->handle, query, nByte, &stmt, tail);
     if(err != SQLITE_OK){
         throw SQLiteException(err);
     }
-    return new Statement([&](jobfn_t job){
-        this->add_job(job);
-    }, stmt);
+
+    // Keep a pointer to self in every statement so the connection
+    // cannot be destroyed before all the statements are finalized.
+    std::shared_ptr<Connection> self(this->self);
+    return new Statement{stmt, [self](jobfn_t job){
+        self->add_job(job);
+    }};
 }
 
-Statement *
-Connection::prepare(const char *query, const char **tail){
-    return this->prepare(query, -1, tail);
-}
-
-Statement *
-Connection::prepare16(const char *query, int nByte, const char **tail){
-    sqlite3_stmt *stmt;
-    int err = sqlite3_prepare16_v2(this->handle, query, nByte, &stmt,
-                                   reinterpret_cast<const void **>(tail));
-    if(err != SQLITE_OK){
-        throw SQLiteException(err);
-    }
-    return new Statement([&](jobfn_t job){
-        this->add_job(job);
-    }, stmt);
-}
-
-Statement *
-Connection::prepare16(const char *query, const char **tail){
-    return this->prepare16(query, -1, tail);
-}
-
-void Connection::worker(){
+void
+Connection::worker()
+{
     while(true){
         jobfn_t job;
         {
             Glib::Threads::Mutex::Lock lock(this->queue_mtx);
-            while(this->queue.empty()) {
+            while(this->queue.empty())
                 this->queue_push.wait(this->queue_mtx);
-            }
             job = this->queue.front();
             this->queue.pop();
         }
@@ -101,10 +64,20 @@ void Connection::worker(){
     }
 }
 
-void Connection::add_job(jobfn_t job){
+void
+Connection::add_job(jobfn_t job)
+{
     {
         Glib::Threads::Mutex::Lock lock(this->queue_mtx);
         this->queue.push(job);
     }
     this->queue_push.signal();
+}
+
+std::shared_ptr<Connection>
+Connection::create(const char *filename)
+{
+    std::shared_ptr<Connection> c(new Connection(filename));
+    c->self = c;
+    return std::move(c);
 }

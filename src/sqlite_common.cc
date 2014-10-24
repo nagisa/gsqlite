@@ -33,11 +33,3 @@ SQLiteException::liberr()
 {
     return this->code >= 0;
 }
-
-std::string
-SQLiteException::show()
-{
-    std::stringstream ss;
-    ss << "SQLiteException(" << this->code << ")";
-    return ss.str();
-}

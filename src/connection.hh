@@ -13,29 +13,19 @@
 ///
 /// This class’ methods are thread-safe and non-blocking (except for
 /// construction and destruction).
-class Connection : public Showable, public Glib::Object {
+class Connection : public Glib::Object {
+
     private:
+        std::weak_ptr<Connection>   self;
         sqlite3 *handle = NULL;
-        int type = 0;
-        Glib::Threads::Mutex   queue_mtx;
-        Glib::Threads::Cond    queue_push;
-        Glib::Threads::Thread *thread;
-        // Lets implement monads, fix the syntax and Haskell is not
-        // too far away! Glory to Artotzka!
-        std::queue<jobfn_t> queue;
+        Glib::Threads::Mutex        queue_mtx;
+        Glib::Threads::Cond         queue_push;
+        Glib::Threads::Thread       *thread;
+        std::queue<jobfn_t>         queue;
 
-    public:
-        /// [Open] a Connection to a SQLite database.
-        /// [Open]: http://www.sqlite.org/c3ref/open.html
-        ///
-        /// This function uses v1 interface.
+    private:
         Connection(const char *filename);
-        /// [Open] a Connection to a SQLite database.
-        /// [Open]: http://www.sqlite.org/c3ref/open.html
-        ///
-        /// This function uses v2 interface.
-        Connection(const char *filename, int flags, const char *zVfs);
-
+    public:
         Connection(const Connection&) = delete;
 
         /// [Close] a Connection to a SQLite database.
@@ -50,15 +40,17 @@ class Connection : public Showable, public Glib::Object {
         /// [Prepare]: www.sqlite.org/c3ref/prepare.html
         Statement* prepare(const char *query, int nByte = -1,
                            const char **tail = NULL);
-        /// @copydoc Connection::prepare
-        Statement* prepare(const char *query, const char **tail);
-        /// @copydoc Connection::prepare
-        Statement* prepare16(const char *query, int nByte = -1,
-                             const char **tail = NULL);
-        /// @copydoc Connection::prepare
-        Statement* prepare16(const char *query, const char **tail);
 
-        std::string show() override;
+        /// [Open] a Connection to a SQLite database.
+        /// [Open]: http://www.sqlite.org/c3ref/open.html
+        ///
+        /// This function uses v1 interface.
+        static std::shared_ptr<Connection> create(const char *filename);
+
+        /// Get a last error that occured on this connection.
+        ///
+        /// These errors are potentially most accurate available.
+        friend SQLiteException getError(Connection&);
     private:
         void worker();
         void add_job(jobfn_t);

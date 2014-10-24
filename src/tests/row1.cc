@@ -7,8 +7,8 @@
 
 int main(void){
     Gio::init();
-    std::unique_ptr<Connection> c(new Connection(":memory:"));
-    std::unique_ptr<Statement> s(c->prepare("SELECT 42;"));
+    auto c = Connection::create(":memory:");
+    auto s = std::unique_ptr<Statement>(c->prepare("SELECT 42;"));
     auto loop = Glib::MainLoop::create();
     {
     auto row = s->next();

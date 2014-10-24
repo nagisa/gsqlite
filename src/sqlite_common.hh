@@ -14,7 +14,7 @@ typedef std::function<void ()> jobfn_t;
 /// An exception object thrown when underlying SQLite errors occur
 /// (informational) or API misuse which might cause SQLite errors occur
 /// (preventional).
-class SQLiteException : public std::exception, public Showable {
+class SQLiteException : public std::exception {
     public:
         SQLiteException(int code);
         ~SQLiteException() noexcept {};
@@ -24,8 +24,6 @@ class SQLiteException : public std::exception, public Showable {
         /// Tells whether the error is informational (false) or preventional
         /// (true).
         bool liberr();
-
-        std::string show() override;
     private:
         int code;
 };

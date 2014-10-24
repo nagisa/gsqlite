@@ -9,7 +9,7 @@
 // Tests variety of extract and operator[] function combinations.
 int main(void){
     Gio::init();
-    std::unique_ptr<Connection> c(new Connection(":memory:"));
+    auto c = Connection::create(":memory:");
     std::unique_ptr<Statement> s(c->prepare("SELECT 42, NULL, 3.1415926535;"));
     auto loop = Glib::MainLoop::create();
     {

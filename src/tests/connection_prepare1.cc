@@ -1,10 +1,11 @@
-#include <memory>
+#include <giomm.h>
 
 #include "../connection.hh"
 #include "testing.hpp"
 
 int main(void){
-    std::unique_ptr<Connection> c(new Connection(":memory:"));
+    Gio::init();
+    auto c = Connection::create(":memory");
 
     SHOULD_THROW("preparation of empty query should fail",
                  SQLiteException,
