@@ -1,7 +1,8 @@
 #include <gtkmm/application.h>
 #include <iostream>
+#include <sqlitemm/private/sigc_fix.hh>
 
-#include "ui/window.hh"
+#include "window.hh"
 
 int main(int argc, char** argv){
     auto app = Gtk::Application::create("org.apps.gSQLite");

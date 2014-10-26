@@ -1,14 +1,25 @@
+#include "error.hh"
 #include "connection.hh"
+#include "statement.hh"
 
 Connection::Connection(const char *filename)
     : Glib::ObjectBase(typeid(Connection))
+    , handle(nullptr)
 {
     int ret = SQLITE_OK;
     if((ret = sqlite3_open(filename, &this->handle)) != SQLITE_OK)
-        throw SQLiteException(ret);
+        throw SQLiteError(ret);
     this->thread = Glib::Threads::Thread::create([this](){
         this->worker();
     });
+}
+
+std::shared_ptr<Connection>
+Connection::create(const char *filename)
+{
+    std::shared_ptr<Connection> c(new Connection(filename));
+    c->self = c;
+    return std::move(c);
 }
 
 Connection::~Connection()
@@ -23,9 +34,8 @@ Connection::~Connection()
 
     ret = sqlite3_close(this->handle);
     if(ret != SQLITE_OK) {
-        throw SQLiteException(ret);
-        // TODO: Well, dang. Apparently one should never throw from destructors.
-        // Maybe log an error or something?
+        // In case of sound API this should never happen.
+        throw SQLiteError(*this);
     }
     this->thread = NULL;
     this->handle = NULL;
@@ -36,16 +46,27 @@ Connection::prepare(const char *query, int nByte, const char **tail)
 {
     sqlite3_stmt *stmt;
     int err = sqlite3_prepare_v2(this->handle, query, nByte, &stmt, tail);
-    if(err != SQLITE_OK){
-        throw SQLiteException(err);
-    }
+    if(err != SQLITE_OK)
+        throw SQLiteError(*this);
 
     // Keep a pointer to self in every statement so the connection
     // cannot be destroyed before all the statements are finalized.
     std::shared_ptr<Connection> self(this->self);
-    return new Statement{stmt, [self](jobfn_t job){
-        self->add_job(job);
+    return new Statement{stmt, self, [this](jobfn_t job){
+        this->add_job(job);
     }};
+}
+
+int
+Connection::error_code()
+{
+    return sqlite3_errcode(this->handle);
+}
+
+Glib::ustring
+Connection::error_message()
+{
+    return { sqlite3_errmsg(this->handle) };
 }
 
 void
@@ -72,12 +93,4 @@ Connection::add_job(jobfn_t job)
         this->queue.push(job);
     }
     this->queue_push.signal();
-}
-
-std::shared_ptr<Connection>
-Connection::create(const char *filename)
-{
-    std::shared_ptr<Connection> c(new Connection(filename));
-    c->self = c;
-    return std::move(c);
 }

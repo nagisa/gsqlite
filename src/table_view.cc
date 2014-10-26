@@ -1,5 +1,7 @@
-#include "table_view.hh"
 #include <sstream>
+#include <sqlitemm/private/sigc_fix.hh>
+
+#include "table_view.hh"
 
 using namespace GSQLiteui;
 
@@ -11,6 +13,7 @@ TableList::TableListColumnRecord::TableListColumnRecord()
 TableList::TableList(Connection &c)
     : Glib::ObjectBase("gsqlite_TableList")
     , Gtk::TreeView()
+    , cancellable(Gio::Cancellable::create())
 {
     this->store = Gtk::ListStore::create(this->columns);
     this->set_model(this->store);
@@ -23,17 +26,16 @@ TableList::TableList(Connection &c)
                        "UNION ALL SELECT name FROM sqlite_temp_master "
                            "WHERE type IN ('table','view') "
                        "ORDER BY 1");
-    // Head-ache-free resource management (note: stmt in lambda capture is
+    // Headache-free resource management (note: stmt in lambda capture is
     // necessary)
     std::shared_ptr<Statement> stmt(c.prepare(query));
-    stmt->iterate([this, stmt](Statement::result_t r){
-        if(r->state().get_value() == Row::DONE) return false;
+    stmt->iterate([this, stmt](Statement::result_t &res){
+        auto row = stmt->iteration_finish(res);
         Glib::ustring name(reinterpret_cast<const char *>(
-                               r->extract<const unsigned char *>(0)));
+                           row->extract<const unsigned char *>(0)));
         auto entry = this->store->append();
         entry->set_value(this->columns.table_name, name);
-        return true;
-    });
+    }, this->cancellable);
     this->get_selection()->signal_changed().connect([this](){
         auto row = this->get_selection()->get_selected();
         if(!row){
@@ -50,6 +52,7 @@ TableList::TableList(Connection &c)
 
 TableList::~TableList()
 {
+    this->cancellable->cancel();
 }
 
 TableList::table_select_sig_t
@@ -83,7 +86,7 @@ TableView::TableView(std::shared_ptr<Connection> c)
         std::unique_ptr<Statement> stmt;
         try {
             stmt.reset(this->c->prepare(ss.str().c_str(), ss.str().length()));
-        } catch (SQLiteException& e) {
+        } catch (SQLiteError& e) {
             delete this->table_contents.release();
             this->table_contents_sw.remove();
             return;

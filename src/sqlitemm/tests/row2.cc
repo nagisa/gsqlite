@@ -1,20 +1,18 @@
 #include <memory>
 #include <cmath>
-#include <giomm.h>
 
-#include "../connection.hh"
-#include "../row.hh"
 #include "testing.hpp"
+#include "../sqlitemm.hh"
 
 // Tests variety of extract and operator[] function combinations.
 int main(void){
     Gio::init();
     auto c = Connection::create(":memory:");
-    std::unique_ptr<Statement> s(c->prepare("SELECT 42, NULL, 3.1415926535;"));
+    std::shared_ptr<Statement> s(c->prepare("SELECT 42, NULL, 3.1415926535;"));
     auto loop = Glib::MainLoop::create();
     {
-    auto row = s->next();
-    row->monitor([row, loop](Row::state_t s){
+    s->next_async([s, loop](Glib::RefPtr<Gio::AsyncResult>& res){
+        auto row = s->next_finish(res);
         SHOULD("column count is 3",
                row->columns() == 3);
         SHOULD("first column is int equal to 42",
@@ -23,7 +21,7 @@ int main(void){
                std::fabs(row->extract<double>(2) - 3.1415926535) < 1E-6L);
 
         SHOULD_THROW("extract with invalid type should fail",
-                     SQLiteException,
+                     SQLiteError,
                      { row->extract<const void *>(1); });
 
         SHOULD("get return nullptr on NULL",
@@ -31,7 +29,7 @@ int main(void){
         SHOULD("get return non-nullptr on non-NULL",
                (*row)[2] != nullptr);
         loop->quit();
-        return false;
+        delete row;
     });
     }
 

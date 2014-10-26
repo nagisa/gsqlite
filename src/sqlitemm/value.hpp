@@ -1,9 +1,9 @@
 #pragma once
 #include <cinttypes>
-#include "sqlite_common.hh"
+#include <sqlite3.h>
 
 /// @brief Objects representing SQLite values.
-class Value : public Showable {
+class Value {
     public:
         virtual ~Value(){};
 
@@ -23,7 +23,6 @@ class name : public derive {\
         int getType() override { return (type_enum); };\
         /** Dereference the object into POD type stored inside */ \
         virtual type operator*() { return this->value; }; \
-        std::string show() override { return #name"()"; }; \
 }
 
 /// Values of SQLITE_INTEGER fundamental SQLite data type.

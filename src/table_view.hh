@@ -2,9 +2,8 @@
 
 #include <gtkmm.h>
 #include <glibmm.h>
+#include <sqlitemm/sqlitemm.hh>
 
-#include "../sigc_common.hh"
-#include "../connection.hh"
 #include "query_result_widget.hh"
 
 namespace GSQLiteui {
@@ -25,6 +24,8 @@ class TableList : public Gtk::TreeView {
         Gtk::TreeIter                previous;
         table_select_sig_t           _signal_table_select;
         table_deselect_sig_t         _signal_table_deselect;
+
+        Glib::RefPtr<Gio::Cancellable> cancellable;
     public:
         TableListColumnRecord        columns;
         Glib::RefPtr<Gtk::ListStore> store;

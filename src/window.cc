@@ -1,4 +1,5 @@
 #include <giomm/file.h>
+#include <sqlitemm/private/sigc_fix.hh>
 
 #include "window.hh"
 

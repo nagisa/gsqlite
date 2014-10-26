@@ -7,49 +7,42 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wpedantic -Wno-deprecated-register")
 set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -flto")
 
-find_package(PkgConfig)
-find_library(SQLITE sqlite3 REQUIRED)
-
-find_package(Threads REQUIRED)
-
-# set(Boost_USE_STATIC_LIBS ON)
-# find_package(Boost COMPONENTS system thread REQUIRED)
-# link_directories(${Boost_LIBRARY_DIR})
-# include_directories(${Boost_INCLUDE_DIR})
-
-pkg_check_modules(GTKMM gtkmm-3.0)
-link_directories(${GTKMM_LIBRARY_DIRS})
-include_directories(${GTKMM_INCLUDE_DIRS})
-
-pkg_check_modules(GLIBMM glibmm-2.4)
-link_directories(${GLIBMM_LIBRARY_DIRS})
-include_directories(${GLIBMM_INCLUDE_DIRS})
-
-pkg_check_modules(GIOMM giomm-2.4)
-link_directories(${GIOMM_LIBRARY_DIRS})
-include_directories(${GIOMM_INCLUDE_DIRS})
-
-set(CORE_LIBRARIES gsqlitel ${SQLITE} ${GLIBMM_LIBRARIES} ${GIOMM_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-set(ALL_LIBRARIES gsqliteui ${CORE_LIBRARIES} ${GTKMM_LIBRARIES})
-
-add_library(gsqlitel STATIC interfaces connection sqlite_common statement row value)
-add_executable(gsqlite gsqlite.cc)
-target_link_libraries(gsqlite ${ALL_LIBRARIES})
-
-add_subdirectory(ui)
-
 # tests
 enable_testing()
-add_subdirectory(tests)
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+macro("test_it" n)
+    add_executable(${n} ${n})
+    target_link_libraries(${n} ${TESTS_LIBRARIES})
+    add_dependencies(check ${n})
+    add_test(NAME ${n} COMMAND ${n})
+endmacro("test_it")
 
 # documentation
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
+                   ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
     add_custom_target(doc
     ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         COMMENT "Generating API documentation with Doxygen" VERBATIM
     )
 endif(DOXYGEN_FOUND)
+
+
+# Dependencies
+find_package(PkgConfig)
+find_library(SQLITE sqlite3 REQUIRED)
+find_package(Threads REQUIRED)
+pkg_check_modules(GLIBMM glibmm-2.4)
+pkg_check_modules(GIOMM giomm-2.4)
+pkg_check_modules(GTKMM gtkmm-3.0)
+
+
+add_subdirectory(sqlitemm)
+
+
+add_executable(gsqlite gsqlite window table_view query_result_widget)
+target_link_libraries(gsqlite ${SQLITEMM_LIBRARIES} ${GTKMM_LIBRARIES})
+target_include_directories(gsqlite PRIVATE ${GTKMM_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR})

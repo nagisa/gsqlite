@@ -2,10 +2,9 @@
 
 #include <gtkmm.h>
 #include <glibmm.h>
+#include <sqlitemm/sqlitemm.hh>
 
 #include "table_view.hh"
-#include "../sigc_common.hh"
-#include "../connection.hh"
 
 namespace GSQLiteui {
 

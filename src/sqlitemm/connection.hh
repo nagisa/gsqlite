@@ -1,23 +1,22 @@
 #pragma once
-
 #include <sqlite3.h>
 #include <queue>
 #include <glibmm/threads.h>
 #include <glibmm/object.h>
 
-#include "interfaces.hh"
-#include "statement.hh"
-#include "sqlite_common.hh"
+// Forward declaration
+class Statement;
 
 /// @brief An open database connection.
 ///
 /// This class’ methods are thread-safe and non-blocking (except for
 /// construction and destruction).
 class Connection : public Glib::Object {
+    typedef std::function<void ()> jobfn_t;
 
     private:
         std::weak_ptr<Connection>   self;
-        sqlite3 *handle = NULL;
+        sqlite3                     *handle;
         Glib::Threads::Mutex        queue_mtx;
         Glib::Threads::Cond         queue_push;
         Glib::Threads::Thread       *thread;
@@ -50,7 +49,11 @@ class Connection : public Glib::Object {
         /// Get a last error that occured on this connection.
         ///
         /// These errors are potentially most accurate available.
-        friend SQLiteException getError(Connection&);
+        int error_code();
+
+        /// @copy_doc error_code
+        Glib::ustring error_message();
+
     private:
         void worker();
         void add_job(jobfn_t);

@@ -1,12 +1,10 @@
-#include <giomm.h>
-
 #include "testing.hpp"
-#include "../connection.hh"
+#include "../sqlitemm.hh"
 
 int main(void){
     Gio::init();
     SHOULD_THROW("creation of database on directory should fail",
-                 SQLiteException,
+                 SQLiteError,
                  { Connection::create("/"); });
     return 0;
 }

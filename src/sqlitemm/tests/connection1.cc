@@ -1,7 +1,5 @@
-#include <giomm.h>
-
 #include "testing.hpp"
-#include "../connection.hh"
+#include "../sqlitemm.hh"
 
 int main(void){
     Gio::init();
