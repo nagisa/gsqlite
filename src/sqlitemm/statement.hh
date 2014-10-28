@@ -21,12 +21,11 @@ class Statement : Glib::Object {
     private:
         sqlite3_stmt *statement;
         schedule_fn_t schedule_fn;
-        std::shared_ptr<Connection> connection;
+        connection_ptr_t connection;
 
     public:
         Statement(sqlite3_stmt *, connection_ptr_t, schedule_fn_t);
         Statement(Statement &&);
-        Statement(GObject *);
         Statement(const Statement &) = delete;
         ~Statement();
 
