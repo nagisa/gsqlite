@@ -21,13 +21,15 @@ class Window : public Gtk::ApplicationWindow {
     Glib::Property<Glib::RefPtr<Gio::File>> database_file;
     Glib::Property<std::shared_ptr<Connection>> connection;
 
-    void open_file_dialog();
-    void update_header();
-    void reconnect();
-
     public:
         Window();
         ~Window();
+
+    private:
+        void open_file_dialog();
+        void update_header();
+        void reconnect();
+
 };
 
 /// Dialog to open a database file.

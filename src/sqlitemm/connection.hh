@@ -35,16 +35,17 @@ class Connection : public Glib::Object {
         /// for this connection must be destroyed before the Connection itself.
         ~Connection();
 
-        /// [Prepare] a Statement on an open SQLite database.
-        /// [Prepare]: www.sqlite.org/c3ref/prepare.html
-        Statement* prepare(const char *query, int nByte = -1,
-                           const char **tail = NULL);
-
         /// [Open] a Connection to a SQLite database.
         /// [Open]: http://www.sqlite.org/c3ref/open.html
         ///
         /// This function uses v1 interface.
         static std::shared_ptr<Connection> create(const char *filename);
+
+
+        /// [Prepare] a Statement on an open SQLite database.
+        /// [Prepare]: www.sqlite.org/c3ref/prepare.html
+        Statement* prepare(const char *query, int nByte = -1,
+                           const char **tail = NULL);
 
         /// Get a last error that occured on this connection.
         ///

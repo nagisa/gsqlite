@@ -71,8 +71,8 @@ TableView::TableView(std::shared_ptr<Connection> c)
     : Glib::ObjectBase("gsqlite_TableView")
     , Gtk::Paned()
     , c(c)
+    , table_list(new GSQLiteui::TableList(*c))
 {
-    this->table_list.reset(new GSQLiteui::TableList(*c));
     this->pack2(this->table_contents_sw, true, false);
     this->pack1(this->table_list_sw, false, false);
     this->table_list_sw.set_policy(Gtk::PolicyType::POLICY_NEVER,
@@ -104,10 +104,4 @@ TableView::TableView(std::shared_ptr<Connection> c)
 
 TableView::~TableView()
 {
-}
-
-void
-TableView::table_selection_changed()
-{
-    // Should take care of signal emission when table selection changes
 }

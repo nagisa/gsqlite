@@ -21,15 +21,14 @@ class TableList : public Gtk::TreeView {
                 TableListColumnRecord();
         };
 
-        Gtk::TreeIter                previous;
-        table_select_sig_t           _signal_table_select;
-        table_deselect_sig_t         _signal_table_deselect;
+        Gtk::TreeIter                  previous;
+        table_select_sig_t             _signal_table_select;
+        table_deselect_sig_t           _signal_table_deselect;
 
+        TableListColumnRecord          columns;
+        Glib::RefPtr<Gtk::ListStore>   store;
         Glib::RefPtr<Gio::Cancellable> cancellable;
     public:
-        TableListColumnRecord        columns;
-        Glib::RefPtr<Gtk::ListStore> store;
-
         TableList(Connection &);
         ~TableList();
 
@@ -47,8 +46,6 @@ class TableView : public Gtk::Paned {
 
         TableView(std::shared_ptr<Connection>);
         ~TableView();
-
-        void table_selection_changed();
 };
 
 }
