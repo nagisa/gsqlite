@@ -58,13 +58,13 @@ Connection::prepare(const char *query, int nByte, const char **tail)
 }
 
 int
-Connection::error_code()
+Connection::error_code() const
 {
     return sqlite3_errcode(this->handle);
 }
 
 Glib::ustring
-Connection::error_message()
+Connection::error_message() const
 {
     return { sqlite3_errmsg(this->handle) };
 }

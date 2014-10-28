@@ -24,7 +24,7 @@ Row::columns()
 }
 
 Value *
-Row::operator[](size_t n)
+Row::operator[](const size_t n)
 {
     return this->values[n].get();
 };
@@ -40,25 +40,25 @@ Row::operator[](size_t n)
 }
 
 template<> int64_t
-Row::extract(size_t n)
+Row::extract(const size_t n)
 {
     GENERATE_EXTRACT(IntValue *, n);
 }
 
 template<> double
-Row::extract(size_t n)
+Row::extract(const size_t n)
 {
     GENERATE_EXTRACT(FloatValue *, n);
 }
 
 template<> const void *
-Row::extract(size_t n)
+Row::extract(const size_t n)
 {
     GENERATE_EXTRACT(BlobValue *, n);
 }
 
 template<> const unsigned char *
-Row::extract(size_t n)
+Row::extract(const size_t n)
 {
     GENERATE_EXTRACT(TextValue *, n);
 }

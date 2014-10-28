@@ -49,10 +49,10 @@ class Connection : public Glib::Object {
         /// Get a last error that occured on this connection.
         ///
         /// These errors are potentially most accurate available.
-        int error_code();
+        int error_code() const;
 
         /// @copy_doc error_code
-        Glib::ustring error_message();
+        Glib::ustring error_message() const;
 
     private:
         void worker();

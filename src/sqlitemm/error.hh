@@ -9,8 +9,8 @@ class SQLiteError : public Glib::Error {
     static bool registered;
     public:
         static Glib::Quark quark;
-        SQLiteError(Connection&);
-        SQLiteError(int);
+        SQLiteError(const Connection&);
+        SQLiteError(const int);
         SQLiteError(GError *);
         ~SQLiteError();
 

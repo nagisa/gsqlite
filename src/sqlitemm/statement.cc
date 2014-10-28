@@ -36,19 +36,19 @@ Statement::columns()
 }
 
 const char *
-Statement::origin_name(int n)
+Statement::origin_name(const int n)
 {
     return sqlite3_column_origin_name(this->statement, n);
 }
 
 int
-Statement::column_type(int n)
+Statement::column_type(const int n)
 {
     return sqlite3_column_type(this->statement, n);
 }
 
 const char*
-Statement::column_decltype(int n)
+Statement::column_decltype(const int n)
 {
     return sqlite3_column_decltype(this->statement, n);
 }

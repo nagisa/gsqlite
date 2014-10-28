@@ -26,7 +26,7 @@ class Row : public Glib::Object {
         /// Will throw std::logic_error if the row is invalid.
         /// Value belongs to Row and should not be deleted.
         /// Warning: bounds are not checked, indexing over bounds is undefined.
-        Value* operator[](size_t n);
+        Value* operator[](const size_t n);
 
         /// Extract usable value at column n (0-indexed)
         ///
@@ -41,14 +41,14 @@ class Row : public Glib::Object {
         /// Warning: variants of extract which return a pointer (non-POD)
         /// don’t copy, therefore extracted data will only live as long
         /// as Row from which the value is extracted.
-        template<typename T> T extract(size_t n);
+        template<typename T> T extract(const size_t n);
 };
 
 /// @copydoc Row::extract
-template <> int64_t Row::extract(size_t n);
+template <> int64_t Row::extract(const size_t n);
 /// @copydoc Row::extract
-template <> double Row::extract(size_t n);
+template <> double Row::extract(const size_t n);
 /// @copydoc Row::extract
-template <> const void *Row::extract(size_t n);
+template <> const void *Row::extract(const size_t n);
 /// @copydoc Row::extract
-template <> const unsigned char* Row::extract(size_t n);
+template <> const unsigned char* Row::extract(const size_t n);

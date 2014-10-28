@@ -19,14 +19,14 @@ SQLiteError::raise(GError *e)
     SQLiteError::registered = true;\
 }
 
-SQLiteError::SQLiteError(Connection& c)
+SQLiteError::SQLiteError(const Connection& c)
     : Glib::Error(SQLiteError::quark.id(), c.error_code(),
                   c.error_message())
 {
     REGISTER_ERROR
 }
 
-SQLiteError::SQLiteError(int code)
+SQLiteError::SQLiteError(const int code)
     : Glib::Error(SQLiteError::quark.id(), code,
                   SQLiteError::message_for_code(code))
 {

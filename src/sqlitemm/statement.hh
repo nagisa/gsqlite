@@ -40,19 +40,19 @@ class Statement : Glib::Object {
         ///
         /// @param n result column returned by the query. The left-most column
         /// is 0.
-        const char *origin_name(int n);
+        const char *origin_name(const int n);
 
         /// Determine the type of result column.
         ///
         /// @param n result column returned by the query. The left-most column
         /// is 0.
-        int column_type(int n);
+        int column_type(const int n);
 
         /// Determine the declared type of result column.
         ///
         /// @param n result column returned by the query. The left-most column
         /// is 0.
-        const char* column_decltype(int n);
+        const char* column_decltype(const int n);
 
         /// @brief Retrieve next result row asynchronously.
         void next_async(Gio::SlotAsyncReady);
