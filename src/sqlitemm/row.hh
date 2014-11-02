@@ -12,7 +12,7 @@ class Row : public Glib::Object {
     public:
         typedef std::vector<std::unique_ptr<Value>> values_t;
     private:
-        values_t                            values;
+        values_t values;
     public:
         Row(values_t);
         ~Row();
