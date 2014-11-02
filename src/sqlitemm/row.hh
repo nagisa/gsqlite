@@ -28,6 +28,11 @@ class Row : public Glib::Object {
         /// Warning: bounds are not checked, indexing over bounds is undefined.
         Value* operator[](const size_t n);
 
+        /// Similar to Row::operator[]. The only difference being in
+        /// this making subsequent operations on the the column
+        /// invalid and give control over Value lifetime to the caller.
+        Value* steal(const size_t n);
+
         /// Extract usable value at column n (0-indexed)
         ///
         /// Will throw if:

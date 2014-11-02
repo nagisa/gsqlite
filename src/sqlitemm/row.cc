@@ -29,6 +29,12 @@ Row::operator[](const size_t n)
     return this->values[n].get();
 };
 
+Value *
+Row::steal(const size_t n)
+{
+    return this->values[n].release();
+}
+
 #define GENERATE_EXTRACT(type, index) {\
     auto ptr = (*this)[(index)];\
     if(ptr == nullptr)\
