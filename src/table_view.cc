@@ -3,7 +3,115 @@
 
 #include "table_view.hh"
 
+#define TABLE_INFO_SP 10
+
 using namespace GSQLiteui;
+
+TableInfo::ColumnsRecord::ColumnsRecord()
+{
+    this->add(name);
+    this->add(type);
+    this->add(notnull);
+    this->add(default_value);
+    this->add(primary);
+}
+
+TableInfo::TableInfo(std::shared_ptr<Connection> c)
+    : Glib::ObjectBase("gsqlite_TableInfo")
+    , c(c)
+    , cancellable(Gio::Cancellable::create())
+    , name_column("Column name", this->columns_record.name)
+    , type_column("Column type", this->columns_record.type)
+    , notnull_column("Not null", this->columns_record.notnull)
+    , default_column("Default value", this->columns_record.default_value)
+    , primary_column("Primary", this->columns_record.primary)
+{
+    // Error view
+    this->error_box.set_orientation(Gtk::Orientation::ORIENTATION_VERTICAL);
+    this->error_icon.property_icon_name() = "action-unavailable-symbolic";
+    this->error_icon.property_pixel_size() = 128;
+    this->error_icon.set_valign(Gtk::Align::ALIGN_END);
+    this->error_message.set_valign(Gtk::Align::ALIGN_START);
+    this->error_message.set_justify(Gtk::Justification::JUSTIFY_CENTER);
+    this->error_box.pack_start(this->error_icon, true, true, TABLE_INFO_SP);
+    this->error_box.pack_start(this->error_message, true, true, TABLE_INFO_SP);
+    this->error_message.set_text({"Table info cannot be displayed"});
+    this->add(this->error_box, "error");
+
+    // Table info
+    this->info_box.set_orientation(Gtk::Orientation::ORIENTATION_VERTICAL);
+    this->table_title.property_halign() = Gtk::Align::ALIGN_START;
+    this->table_title.property_valign() = Gtk::Align::ALIGN_START;
+    auto attrs = Pango::AttrList();
+    auto attr = Pango::Attribute::create_attr_scale(2);
+    attrs.insert(attr);
+    this->table_title.property_attributes() = attrs;
+    this->info_box.pack_start(this->table_title, false, true, TABLE_INFO_SP);
+
+    this->info_box.pack_start(this->columns_frame, true, true, 0);
+    this->columns_frame.set_label("Columns");
+    this->columns_frame.add(this->columns_view);
+    this->columns_frame.set_shadow_type(Gtk::SHADOW_NONE);
+    this->columns_store = Gtk::ListStore::create(this->columns_record);
+    this->columns_view.set_model(this->columns_store);
+    this->columns_view.append_column(this->name_column);
+    this->columns_view.append_column(this->type_column);
+    this->columns_view.append_column(this->notnull_column);
+    this->columns_view.append_column(this->default_column);
+    this->columns_view.append_column(this->primary_column);
+
+    this->cancellable->signal_cancelled().connect([this](){
+        if(this->columns_cancellable)
+            this->columns_cancellable->cancel();
+    });
+
+    this->add(this->info_box, "info");
+    this->set_no_show_all(true);
+}
+
+TableInfo::~TableInfo()
+{
+    this->cancellable->cancel();
+}
+
+void
+TableInfo::display_table(Glib::ustring &table_name)
+{
+    this->set_no_show_all(false);
+    this->show_all();
+
+    if(this->columns_cancellable)
+        this->columns_cancellable->cancel();
+    this->columns_cancellable = Gio::Cancellable::create();
+    std::shared_ptr<Statement> stmt;
+
+    try {
+        Glib::ustring query("PRAGMA table_info(");
+        query += table_name + ");";
+        stmt.reset(this->c->prepare(query.c_str()));
+    } catch (SQLiteError &e) {
+        Glib::ustring error("Cannot display ");
+        error += table_name + "\n" + e.what();
+        this->error_message.set_text(error);
+        this->set_visible_child(this->error_box);
+        return;
+    }
+
+    this->table_title.set_text(table_name);
+    this->columns_store->clear();
+    stmt->iterate([this,stmt](Statement::result_t res){
+        auto row = stmt->iteration_finish(res);
+        auto iter = this->columns_store->append();
+        iter->set_value(this->columns_record.name, row->steal(1));
+        iter->set_value(this->columns_record.type, row->steal(2));
+        iter->set_value(this->columns_record.notnull, row->steal(3));
+        iter->set_value(this->columns_record.default_value, row->steal(4));
+        iter->set_value(this->columns_record.primary, row->steal(5));
+    }, this->columns_cancellable);
+
+
+    this->set_visible_child(this->info_box);
+}
 
 TableList::TableListColumnRecord::TableListColumnRecord()
 {
@@ -72,33 +180,18 @@ TableView::TableView(std::shared_ptr<Connection> c)
     , Gtk::Paned()
     , c(c)
     , table_list(new GSQLiteui::TableList(*c))
+    , table_info(c)
 {
-    this->pack2(this->table_contents_sw, true, false);
+    this->pack2(this->table_info_sw, true, false);
     this->pack1(this->table_list_sw, false, false);
+    this->table_info_sw.add(this->table_info);
     this->table_list_sw.set_policy(Gtk::PolicyType::POLICY_NEVER,
                                    Gtk::PolicyType::POLICY_AUTOMATIC);
     this->table_list_sw.add(*this->table_list);
     this->table_list_sw.get_style_context()->add_class("sidebar");
 
     this->table_list->signal_table_select().connect([this](Glib::ustring s){
-        std::stringstream ss;
-        ss << "SELECT * FROM " << s << ";";
-        std::unique_ptr<Statement> stmt;
-        try {
-            stmt.reset(this->c->prepare(ss.str().c_str(), ss.str().length()));
-        } catch (SQLiteError& e) {
-            delete this->table_contents.release();
-            this->table_contents_sw.remove();
-            return;
-        }
-        this->table_contents.reset(new QueryResultsWidget(std::move(stmt)));
-        this->table_contents_sw.remove();
-        this->table_contents_sw.add(*this->table_contents);
-        this->table_contents->show_all();
-    });
-    this->table_list->signal_table_deselect().connect([this](){
-        this->table_contents_sw.remove();
-        delete this->table_contents.release();
+        this->table_info.display_table(s);
     });
 }
 

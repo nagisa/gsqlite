@@ -6,7 +6,10 @@
 namespace GSQLiteui {
 
 class QueryResultsWidget : public Gtk::TreeView {
-    typedef std::unique_ptr<Statement> statement_t;
+    public:
+        typedef std::unique_ptr<Statement> statement_t;
+
+    private:
     Glib::RefPtr<Gtk::ListStore>   store;
     Gtk::TreeModel::ColumnRecord   columns;
     statement_t                    statement;
