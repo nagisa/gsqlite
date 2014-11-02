@@ -36,6 +36,13 @@ Statement::columns()
 }
 
 const char *
+Statement::column_name(const int n)
+{
+    return sqlite3_column_name(this->statement, n);
+}
+
+
+const char *
 Statement::origin_name(const int n)
 {
     return sqlite3_column_origin_name(this->statement, n);

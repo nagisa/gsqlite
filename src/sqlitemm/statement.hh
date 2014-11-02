@@ -34,6 +34,8 @@ class Statement : Glib::Object {
         /// SQL statement that does not return data (for example an UPDATE).
         int columns();
 
+        const char *column_name(const int n);
+
         /// Determine the name of table column that is the origin
         /// of a particular result column in SELECT statement.
         ///

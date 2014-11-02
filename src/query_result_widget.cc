@@ -13,7 +13,7 @@ QueryResultsWidget::QueryResultsWidget(statement_t&& s)
     for(int i = 0; i < cols; i += 1) {
         Gtk::TreeModelColumn<Glib::ustring> col;
         this->columns.add(col);
-        this->append_column(this->statement->origin_name(i), col);
+        this->append_column(this->statement->column_name(i), col);
     }
 
     this->store = Gtk::ListStore::create(this->columns);
