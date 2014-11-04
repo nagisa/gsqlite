@@ -22,7 +22,7 @@ TableInfo::TableInfo(std::shared_ptr<Connection> c)
     , cancellable(Gio::Cancellable::create())
     , name_column("Column name", this->columns_record.name)
     , type_column("Column type", this->columns_record.type)
-    , notnull_column("Not null", this->columns_record.notnull)
+    , notnull_column("Nullable", this->columns_record.notnull)
     , default_column("Default value", this->columns_record.default_value)
     , primary_column("Primary", this->columns_record.primary)
 {
@@ -57,8 +57,24 @@ TableInfo::TableInfo(std::shared_ptr<Connection> c)
     this->columns_view.append_column(this->name_column);
     this->columns_view.append_column(this->type_column);
     this->columns_view.append_column(this->notnull_column);
+    this->notnull_column.set_cell_data_func([](Gtk::CellRendererText *r,
+                                               Value *v){
+        if(!v || v->getType() != SQLITE_INTEGER)
+            return false;
+        int64_t val = **dynamic_cast<IntValue *>(v);
+        r->property_text() = val != 0 ? "NO" : "YES";
+        return true;
+    });
     this->columns_view.append_column(this->default_column);
     this->columns_view.append_column(this->primary_column);
+    this->primary_column.set_cell_data_func([](Gtk::CellRendererText *r,
+                                               Value *v){
+        if(!v || v->getType() != SQLITE_INTEGER)
+            return false;
+        int64_t val = **dynamic_cast<IntValue *>(v);
+        r->property_text() = val == 0 ? "NO" : "YES";
+        return true;
+    });
 
     this->cancellable->signal_cancelled().connect([this](){
         if(this->columns_cancellable)
