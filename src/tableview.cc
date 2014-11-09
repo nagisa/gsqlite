@@ -1,7 +1,7 @@
 #include <sstream>
 #include <sqlitemm/private/sigc_fix.hh>
 
-#include "table_view.hh"
+#include "tableview.hh"
 
 #define TABLE_INFO_SP 10
 

@@ -4,7 +4,8 @@
 #include <glibmm.h>
 #include <sqlitemm/sqlitemm.hh>
 
-#include "table_view.hh"
+#include "sqlview.hh"
+#include "tableview.hh"
 
 namespace GSQLiteui {
 
@@ -15,7 +16,9 @@ class Window : public Gtk::ApplicationWindow {
     Gtk::Button                           primary_button;
     // Content
     Gtk::Stack                            stack;
-    std::unique_ptr<GSQLiteui::TableView> tables;
+    Gtk::StackSwitcher                    stack_switcher;
+    std::unique_ptr<TableView>            tables;
+    std::unique_ptr<SQLView>              sqlview;
 
     // ETC
     Glib::Property<Glib::RefPtr<Gio::File>> database_file;

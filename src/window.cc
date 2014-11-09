@@ -15,6 +15,9 @@ Window::Window()
     this->primary_button.set_label("Open");
     this->primary_button.get_style_context()->add_class("suggested-action");
     this->header.pack_start(this->primary_button);
+    this->header.pack_start(this->stack_switcher);
+    this->stack_switcher.set_stack(this->stack);
+    this->stack_switcher.set_no_show_all(true);
     this->add(this->stack);
 
     this->primary_button.signal_clicked().connect([&](){
@@ -25,11 +28,17 @@ Window::Window()
         this->reconnect();
     });
     this->connection.get_proxy().signal_changed().connect([&](){
+        this->primary_button.hide();
+        this->stack_switcher.set_no_show_all(false);
+        this->stack_switcher.show_all();
         if(this->tables)
             this->stack.remove(*this->tables);
-        this->tables.reset(new GSQLiteui::TableView(this->connection.get_value()));
+        this->tables.reset(new TableView(this->connection.get_value()));
         this->tables->show_all();
-        this->stack.add(*this->tables, "tables", "Tables");
+        this->sqlview.reset(new SQLView(this->connection));
+        this->sqlview->show_all();
+        this->stack.add(*this->tables, "tables", "Database info");
+        this->stack.add(*this->sqlview, "sql", "Custom SQL");
         this->stack.set_visible_child(*this->tables);
     });
 

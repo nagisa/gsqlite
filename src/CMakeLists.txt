@@ -38,11 +38,12 @@ find_package(Threads REQUIRED)
 pkg_check_modules(GLIBMM glibmm-2.4)
 pkg_check_modules(GIOMM giomm-2.4)
 pkg_check_modules(GTKMM gtkmm-3.0)
+pkg_check_modules(SOURCEVIEW gtksourceviewmm-3.0)
 
 
 add_subdirectory(sqlitemm)
 
 
-add_executable(gsqlite gsqlite window table_view value_column query_result_widget)
-target_link_libraries(gsqlite ${SQLITEMM_LIBRARIES} ${GTKMM_LIBRARIES})
-target_include_directories(gsqlite PRIVATE ${GTKMM_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR})
+add_executable(gsqlite gsqlite window tableview sqlview value_column query_result_widget)
+target_link_libraries(gsqlite ${SQLITEMM_LIBRARIES} ${SOURCEVIEW_LIBRARIES} ${GTKMM_LIBRARIES})
+target_include_directories(gsqlite PRIVATE ${GTKMM_INCLUDE_DIRS} ${SOURCEVIEW_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR})
