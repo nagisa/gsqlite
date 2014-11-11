@@ -29,7 +29,7 @@ TextValue::TextValue(sqlite3_value *val)
 {
     if(sqlite3_value_type(val) != SQLITE_TEXT)
         throw SQLiteError(_SQLITE_VALUE_TYPE);
-    this->value = sqlite3_value_text(val);
+    this->value = reinterpret_cast<const char *>(sqlite3_value_text(val));
 }
 
 TextValue::~TextValue()
@@ -41,7 +41,9 @@ BlobValue::BlobValue(sqlite3_value *val)
 {
     if(sqlite3_value_type(val) != SQLITE_BLOB)
         throw SQLiteError(_SQLITE_VALUE_TYPE);
-    this->value = sqlite3_value_blob(val);
+    int len = sqlite3_value_bytes(val);
+    auto v = reinterpret_cast<const char *>(sqlite3_value_blob(val));
+    this->value = std::string(v, len);
 }
 
 BlobValue::~BlobValue()

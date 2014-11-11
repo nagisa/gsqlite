@@ -22,7 +22,7 @@ int main(void){
 
         SHOULD_THROW("extract with invalid type should fail",
                      SQLiteError,
-                     { row->extract<const void *>(1); });
+                     { row->extract<std::string>(1); });
 
         SHOULD("get return nullptr on NULL",
                (*row)[1] == nullptr);

@@ -57,13 +57,13 @@ Row::extract(const size_t n)
     GENERATE_EXTRACT(FloatValue *, n);
 }
 
-template<> const void *
+template<> std::string
 Row::extract(const size_t n)
 {
     GENERATE_EXTRACT(BlobValue *, n);
 }
 
-template<> const unsigned char *
+template<> Glib::ustring
 Row::extract(const size_t n)
 {
     GENERATE_EXTRACT(TextValue *, n);

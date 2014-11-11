@@ -1,4 +1,5 @@
 #pragma once
+#include <glibmm.h>
 #include <cinttypes>
 #include <sqlite3.h>
 
@@ -32,10 +33,10 @@ GEN_VALUE(IntValue, Value, SQLITE_INTEGER, int64_t);
 GEN_VALUE(FloatValue, Value, SQLITE_FLOAT, double);
 
 /// Values of SQLITE_BLOB fundamental SQLite data type.
-GEN_VALUE(BlobValue, Value, SQLITE_BLOB, const void *);
+GEN_VALUE(BlobValue, Value, SQLITE_BLOB, std::string);
 
-/// Values of SQLITE_TEXT fundamental SQLite data type.
-GEN_VALUE(TextValue, Value, SQLITE_TEXT, const unsigned char *);
+/// Values of SQLITE_TEXT fundamental SQLite data type. UTF-8 encoded.
+GEN_VALUE(TextValue, Value, SQLITE_TEXT, Glib::ustring);
 
 #undef GEN_VALUE
 

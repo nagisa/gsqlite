@@ -125,7 +125,6 @@ TableInfo::display_table(Glib::ustring &table_name)
         iter->set_value(this->columns_record.primary, row->steal(5));
     }, this->columns_cancellable);
 
-
     this->set_visible_child(this->info_box);
 }
 
@@ -155,8 +154,7 @@ TableList::TableList(Connection &c)
     std::shared_ptr<Statement> stmt(c.prepare(query));
     stmt->iterate([this, stmt](Statement::result_t &res){
         auto row = stmt->iteration_finish(res);
-        Glib::ustring name(reinterpret_cast<const char *>(
-                           row->extract<const unsigned char *>(0)));
+        Glib::ustring name(row->extract<Glib::ustring>(0));
         auto entry = this->store->append();
         entry->set_value(this->columns.table_name, name);
     }, this->cancellable);
