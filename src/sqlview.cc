@@ -11,6 +11,9 @@ SQLView::SQLView(std::shared_ptr<Connection> c)
     , sqlentry(this->buffer)
     , entry_box(Gtk::Orientation::ORIENTATION_VERTICAL)
 {
+    this->property_position() = 200;
+    this->property_position_set() = true;
+
     Gsv::init();
     auto lman = Gsv::LanguageManager::get_default();
     auto lang = lman->get_language("sql");
