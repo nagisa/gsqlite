@@ -21,30 +21,36 @@ default_cdf(Gtk::CellRendererText *r, Value *value)
        r->property_weight_set() = true;
        r->property_text() = "NULL";
        return true;
-   }
-   switch(value->getType()){
-       case SQLITE_TEXT:
-           r->property_text() = Glib::ustring(
-               reinterpret_cast<const char *>(
-                   **dynamic_cast<TextValue *>(value)
-               )
-           );
-           return true;
-       case SQLITE_INTEGER:
-           r->property_text() = Glib::ustring(std::to_string(
-               **dynamic_cast<IntValue *>(value)
-           ));
-           return true;
-       case SQLITE_FLOAT:
-           r->property_text() = Glib::ustring(std::to_string(
-               **dynamic_cast<FloatValue *>(value)
-           ));
-           return true;
-       case SQLITE_BLOB:
-       default:
-           break;
-   }
-   return false;
+    }
+    switch(value->getType()){
+        case SQLITE_TEXT:
+            {
+            auto str = **dynamic_cast<TextValue *>(value);
+            auto start = str.begin();
+            auto end = start;
+            auto i = 0;
+            for(i = 0; i < 100 && end != str.end(); end++, i++);
+            auto text = Glib::ustring(start, end);
+            if(i > 99)
+                text += "…";
+            r->property_text() = text;
+            }
+            return true;
+        case SQLITE_INTEGER:
+            r->property_text() = Glib::ustring(std::to_string(
+                **dynamic_cast<IntValue *>(value)
+            ));
+            return true;
+        case SQLITE_FLOAT:
+            r->property_text() = Glib::ustring(std::to_string(
+                **dynamic_cast<FloatValue *>(value)
+            ));
+            return true;
+        case SQLITE_BLOB:
+        default:
+            break;
+    }
+    return false;
 }
 
 
