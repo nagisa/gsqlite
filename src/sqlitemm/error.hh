@@ -1,6 +1,11 @@
 #pragma once
 #include <glibmm.h>
 
+#define _SQLITE_NULL_STATEMENT   -1
+#define _SQLITE_ROW_ERROR        -2
+#define _SQLITE_VALUE_TYPE_ERROR -3
+#define _SQLITE_NULL_EXTRACT     -4
+
 // Forward declaration
 class Connection;
 
@@ -20,8 +25,23 @@ class SQLiteError : public Glib::Error {
         static Glib::ustring message_for_code(int code);
 };
 
+class SQLiteNullStatement : public SQLiteError {
+    public:
+        SQLiteNullStatement() : SQLiteError(_SQLITE_NULL_STATEMENT){};
+};
 
-#define _SQLITE_NULL_STATEMENT -1
-#define _SQLITE_ROW_ERROR      -2
-#define _SQLITE_VALUE_TYPE     -3
-#define _SQLITE_NULL_EXTRACT   -4
+class SQLiteRowError : public SQLiteError {
+    public:
+        SQLiteRowError() : SQLiteError (_SQLITE_ROW_ERROR){};
+};
+
+class SQLiteValueTypeError : public SQLiteError {
+    public:
+        SQLiteValueTypeError() : SQLiteError(_SQLITE_VALUE_TYPE_ERROR){};
+};
+
+class SQLiteNullExtract : public SQLiteError {
+    public:
+        SQLiteNullExtract() : SQLiteError(_SQLITE_NULL_EXTRACT){};
+};
+

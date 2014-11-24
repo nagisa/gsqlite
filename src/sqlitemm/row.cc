@@ -9,7 +9,7 @@ Row::Row(Row::values_t values)
     , values(std::move(values))
 {
     if(this->values.empty()){
-        throw SQLiteError(_SQLITE_ROW_ERROR);
+        throw SQLiteRowError();
     }
 }
 
@@ -38,7 +38,7 @@ Row::steal(const size_t n)
 #define GENERATE_EXTRACT(type, index) {\
     auto ptr = (*this)[(index)];\
     if(ptr == nullptr)\
-        throw SQLiteError(_SQLITE_NULL_EXTRACT);\
+        throw SQLiteNullExtract();\
     auto res = dynamic_cast<type>(ptr);\
     if(res == nullptr)\
         throw std::bad_cast();\

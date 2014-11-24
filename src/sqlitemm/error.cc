@@ -55,7 +55,7 @@ SQLiteError::message_for_code(int code)
             return {"query is empty or miscellaneous error has occurred"};
         case _SQLITE_ROW_ERROR:
             return {"row initialized without values"};
-        case _SQLITE_VALUE_TYPE:
+        case _SQLITE_VALUE_TYPE_ERROR:
             return {"value type does not match constructor"};
         case _SQLITE_NULL_EXTRACT:
             return {"extract of null column"};

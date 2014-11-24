@@ -14,7 +14,7 @@ Statement::Statement(sqlite3_stmt *stmt, connection_ptr_t c, schedule_fn_t sch)
     , connection(c)
 {
     if(stmt == NULL)
-        throw SQLiteError(_SQLITE_NULL_STATEMENT);
+        throw SQLiteNullStatement();
 }
 
 Statement::Statement(Statement&& o)
