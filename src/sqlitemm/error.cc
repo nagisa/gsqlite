@@ -59,6 +59,8 @@ SQLiteError::message_for_code(int code)
             return {"value type does not match constructor"};
         case _SQLITE_NULL_EXTRACT:
             return {"extract of null column"};
+        case _SQLITE_STATEMENT_DONE:
+            return {"statement exhausted"};
         default:
             return {"unknown binding error"};
     }

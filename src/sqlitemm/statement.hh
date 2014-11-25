@@ -91,9 +91,4 @@ class Statement : Glib::Object {
                                GCancellable *);
 };
 
-class StatementDone : public std::exception {
-    public:
-        virtual const char *what() const noexcept override {
-            return "Statement exhausted";
-        }
 };

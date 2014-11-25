@@ -125,7 +125,8 @@ void iterate_cb2(GObject *obj, GAsyncResult *res, void *data)
         auto result = Glib::wrap(res, false);
         (*pair->second)(result);
         iterate_cb(pair, g_task_get_cancellable(taskptr));
-    } catch (StatementDone) {
+    } catch (SQLiteStatementDone &e) {
+        // Yay, iteration finished!
     } catch (...) {
         Glib::exception_handlers_invoke();
     }
@@ -166,7 +167,7 @@ Statement::next_finish(Statement::result_t &res)
     auto task = reinterpret_cast<GTask *>(Glib::unwrap(res));
     auto rowptr = static_cast<Row *>(g_task_propagate_pointer(task, &error));
     if(rowptr == nullptr)
-        throw StatementDone();
+        throw SQLiteStatementDone();
     if(error)
         Glib::Error::throw_exception(error);
     return rowptr;

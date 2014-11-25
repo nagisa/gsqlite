@@ -5,6 +5,7 @@
 #define _SQLITE_ROW_ERROR        -2
 #define _SQLITE_VALUE_TYPE_ERROR -3
 #define _SQLITE_NULL_EXTRACT     -4
+#define _SQLITE_STATEMENT_DONE   -5
 
 // Forward declaration
 class Connection;
@@ -45,3 +46,7 @@ class SQLiteNullExtract : public SQLiteError {
         SQLiteNullExtract() : SQLiteError(_SQLITE_NULL_EXTRACT){};
 };
 
+class SQLiteStatementDone : public SQLiteError {
+    public:
+    SQLiteStatementDone() : SQLiteError(_SQLITE_STATEMENT_DONE){};
+};
