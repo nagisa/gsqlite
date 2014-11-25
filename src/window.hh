@@ -11,6 +11,7 @@ namespace GSQLiteui {
 
 /// Main application window
 class Window : public Gtk::ApplicationWindow {
+    protected:
     // Header
     Gtk::HeaderBar                        header;
     Gtk::Button                           primary_button;
@@ -25,21 +26,20 @@ class Window : public Gtk::ApplicationWindow {
     Glib::Property<std::shared_ptr<Connection>> connection;
 
     public:
-        Window();
-        ~Window();
+    Window();
+    ~Window();
 
-    private:
-        void open_file_dialog();
-        void update_header();
-        void reconnect();
+    protected:
+    void open_file_dialog();
+    void update_header();
+    void reconnect();
 
 };
 
 /// Dialog to open a database file.
 class OpenDatabaseDialog : public Gtk::FileChooserDialog {
     public:
-        OpenDatabaseDialog(Gtk::Window &);
-        ~OpenDatabaseDialog();
+    OpenDatabaseDialog(Gtk::Window &);
+    ~OpenDatabaseDialog();
 };
-
 }

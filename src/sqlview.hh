@@ -8,9 +8,11 @@
 namespace GSQLiteui{
 
 class SQLView : public Gtk::Paned {
+    public:
     typedef std::pair<Gtk::TextBuffer::iterator, Gtk::TextBuffer::iterator>
             iterator_pair;
 
+    protected:
     std::shared_ptr<Connection>         c;
     Glib::RefPtr<Gsv::Buffer>           buffer;
     Gsv::View                           sqlentry;
@@ -20,17 +22,17 @@ class SQLView : public Gtk::Paned {
     Gtk::Button                         execute_query;
     Gtk::InfoBar                        error_infobar;
     Gtk::Label                          error_message;
-
     std::unique_ptr<QueryResultsWidget> results;
     Gtk::ScrolledWindow                 results_scroll;
-    public:
-        SQLView(std::shared_ptr<Connection> c);
-        ~SQLView();
 
-    private:
-        void update_button();
-        void exec_action();
-        void close_infobar();
+    public:
+    SQLView(std::shared_ptr<Connection> c);
+    ~SQLView();
+
+    protected:
+    void update_button();
+    void exec_action();
+    void close_infobar();
 };
 
 }

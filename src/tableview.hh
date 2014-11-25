@@ -11,6 +11,7 @@ namespace GSQLiteui {
 
 /// Displays the information about a given table
 class TableInfo : public Gtk::Stack {
+    protected:
     class ColumnsRecord : public Gtk::TreeModel::ColumnRecord {
         public:
         Gtk::TreeModelColumn<Value *>       name;
@@ -27,7 +28,6 @@ class TableInfo : public Gtk::Stack {
     Gtk::Box                      error_box;
     Gtk::Image                    error_icon;
     Gtk::Label                    error_message;
-
     Gtk::Box                       info_box;
     Gtk::Label                     table_title;
     // List of columns
@@ -46,51 +46,53 @@ class TableInfo : public Gtk::Stack {
 
 
     public:
+    TableInfo(std::shared_ptr<Connection>);
+    ~TableInfo();
 
-        TableInfo(std::shared_ptr<Connection>);
-        ~TableInfo();
-        void display_table(Glib::ustring &table_name);
-        void clear_display();
+    void display_table(Glib::ustring &table_name);
+    void clear_display();
 };
 
 /// List of tables in the database
 class TableList : public Gtk::TreeView {
+    public:
     typedef sigc::signal<void, Glib::ustring> table_select_sig_t;
     typedef sigc::signal<void>                table_deselect_sig_t;
 
-    private:
-        class TableListColumnRecord : public Gtk::TreeModel::ColumnRecord {
-            public:
-                Gtk::TreeModelColumn<Glib::ustring> table_name;
-                TableListColumnRecord();
-        };
+    protected:
+    class TableListColumnRecord : public Gtk::TreeModel::ColumnRecord {
+        public:
+            Gtk::TreeModelColumn<Glib::ustring> table_name;
+            TableListColumnRecord();
+    };
 
-        Gtk::TreeIter                  previous;
-        table_select_sig_t             _signal_table_select;
-        table_deselect_sig_t           _signal_table_deselect;
+    Gtk::TreeIter                  previous;
+    table_select_sig_t             _signal_table_select;
+    table_deselect_sig_t           _signal_table_deselect;
+    TableListColumnRecord          columns;
+    Glib::RefPtr<Gtk::ListStore>   store;
+    Glib::RefPtr<Gio::Cancellable> cancellable;
 
-        TableListColumnRecord          columns;
-        Glib::RefPtr<Gtk::ListStore>   store;
-        Glib::RefPtr<Gio::Cancellable> cancellable;
     public:
-        TableList(Connection &);
-        ~TableList();
+    TableList(Connection &);
+    ~TableList();
 
-        table_select_sig_t           signal_table_select();
-        table_deselect_sig_t         signal_table_deselect();
+    table_select_sig_t           signal_table_select();
+    table_deselect_sig_t         signal_table_deselect();
 };
 
 /// Root view for “Table view” section.
 class TableView : public Gtk::Paned {
+    protected:
     std::shared_ptr<Connection>                        c;
+
     public:
-        Gtk::ScrolledWindow                            table_list_sw;
-        std::unique_ptr<GSQLiteui::TableList>          table_list;
-        Gtk::ScrolledWindow                            table_info_sw;
-        GSQLiteui::TableInfo                           table_info;
+    Gtk::ScrolledWindow                            table_list_sw;
+    std::unique_ptr<GSQLiteui::TableList>          table_list;
+    Gtk::ScrolledWindow                            table_info_sw;
+    GSQLiteui::TableInfo                           table_info;
 
-        TableView(std::shared_ptr<Connection>);
-        ~TableView();
+    TableView(std::shared_ptr<Connection>);
+    ~TableView();
 };
-
 }
