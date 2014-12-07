@@ -195,7 +195,7 @@ Statement::iteration_finish(Statement::result_t &res)
     auto task = reinterpret_cast<GTask *>(Glib::unwrap(res));
     auto rowptr = static_cast<Row *>(g_task_propagate_pointer(task, &error));
     if(rowptr == nullptr)
-        throw StatementDone();
+        throw SQLiteStatementDone();
     if(error)
         Glib::Error::throw_exception(error);
     return rowptr;

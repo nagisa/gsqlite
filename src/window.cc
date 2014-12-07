@@ -12,6 +12,7 @@ Window::Window()
     , connection(*this, "connection")
 {
     this->set_titlebar(this->header);
+    this->set_icon_name("system-run");
     this->primary_button.set_label("Open");
     this->primary_button.get_style_context()->add_class("suggested-action");
     this->header.pack_start(this->primary_button);
@@ -118,3 +119,16 @@ OpenDatabaseDialog::OpenDatabaseDialog(Gtk::Window &w)
 OpenDatabaseDialog::~OpenDatabaseDialog()
 {
 };
+
+AboutDialog::AboutDialog()
+    : Glib::ObjectBase("gsqlite_AboutDialog")
+{
+    this->set_program_name("gSQLite");
+    this->set_version("0.1");
+    this->set_authors({"Simonas Kazlauskas"});
+    this->set_license_type(Gtk::License::LICENSE_BSD);
+}
+
+AboutDialog::~AboutDialog()
+{
+}

@@ -42,4 +42,10 @@ class OpenDatabaseDialog : public Gtk::FileChooserDialog {
     OpenDatabaseDialog(Gtk::Window &);
     ~OpenDatabaseDialog();
 };
+
+class AboutDialog : public Gtk::AboutDialog {
+    public:
+    AboutDialog();
+    ~AboutDialog();
+};
 }
