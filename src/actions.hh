@@ -1,16 +1,6 @@
 #pragma once
 #include <giomm.h>
 
-// class StaticAction {
-//     public:
-//     protected:
-//     static action_t action;
-//     public:
-//     StaticAction(Glib::ustring&);
-//     ~StaticAction();
-//     action_t get();
-// };
-
 class StaticAction {
     public:
     typedef Glib::RefPtr<Gio::SimpleAction> action_t;
