@@ -3,7 +3,6 @@
 #include <gtkmm/application.h>
 
 namespace GSQLiteui {
-
 class Application : public Gtk::Application {
     public:
     Application();
@@ -14,5 +13,4 @@ class Application : public Gtk::Application {
     void on_activate();
     void on_show_about();
 };
-
 }

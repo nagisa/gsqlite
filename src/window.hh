@@ -14,7 +14,6 @@ class Window : public Gtk::ApplicationWindow {
     protected:
     // Header
     Gtk::HeaderBar                        header;
-    Gtk::Button                           primary_button;
     // Content
     Gtk::Stack                            stack;
     Gtk::StackSwitcher                    stack_switcher;
@@ -28,9 +27,9 @@ class Window : public Gtk::ApplicationWindow {
     public:
     Window();
     ~Window();
+    void open_file_dialog();
 
     protected:
-    void open_file_dialog();
     void update_header();
     void reconnect();
 

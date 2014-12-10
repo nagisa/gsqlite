@@ -11,25 +11,19 @@ Window::Window()
     , database_file(*this, "database-file")
     , connection(*this, "connection")
 {
+    this->set_default_size(500, 300);
     this->set_titlebar(this->header);
     this->set_icon_name("system-run");
-    this->primary_button.set_label("Open");
-    this->primary_button.get_style_context()->add_class("suggested-action");
-    this->header.pack_start(this->primary_button);
     this->header.pack_start(this->stack_switcher);
     this->stack_switcher.set_stack(this->stack);
     this->stack_switcher.set_no_show_all(true);
     this->add(this->stack);
 
-    this->primary_button.signal_clicked().connect([&](){
-        this->open_file_dialog();
-    });
     this->database_file.get_proxy().signal_changed().connect([&](){
         this->update_header();
         this->reconnect();
     });
     this->connection.get_proxy().signal_changed().connect([&](){
-        this->primary_button.hide();
         this->stack_switcher.set_no_show_all(false);
         this->stack_switcher.show_all();
         if(this->tables)
@@ -53,13 +47,18 @@ Window::~Window()
 void
 Window::open_file_dialog()
 {
-    OpenDatabaseDialog chooser(*this);
-    chooser.set_local_only(true);
-    chooser.signal_response().connect([&](int resp){
-        if(resp == Gtk::RESPONSE_ACCEPT)
-            this->database_file = chooser.get_file();
+    auto chooser = new OpenDatabaseDialog(*this);
+    chooser->set_local_only(true);
+    chooser->signal_response().connect([chooser,this](int resp){
+        if(resp == Gtk::RESPONSE_ACCEPT) {
+            this->database_file = chooser->get_file();
+            this->show_all();
+        } else {
+            delete this;
+        }
+        delete chooser;
     });
-    chooser.run();
+    chooser->show_all();
 }
 
 void

@@ -3,28 +3,41 @@
 
 #include "window.hh"
 #include "application.hh"
+#include "actions.hh"
 
 using namespace GSQLiteui;
+
+Window* create_window(){
+    auto window = new Window();
+    window->signal_delete_event().connect([window](GdkEventAny *e){
+        delete window;
+        return true;
+    });
+    return window;
+};
 
 Application::Application()
     : Glib::ObjectBase("gsqlite_Application")
     , Gtk::Application("org.apps.gSQLite")
 {
-    auto openaction = Gio::SimpleAction::create("open");
-    auto aboutaction = Gio::SimpleAction::create("about");
-    auto quitaction = Gio::SimpleAction::create("quit");
 
-    quitaction->signal_activate().connect([this](const Glib::VariantBase&){
+    quit_action.get()->signal_activate().connect([this](const Glib::VariantBase&){
         this->quit();
     });
 
-    aboutaction->signal_activate().connect([this](const Glib::VariantBase&){
+    about_action.get()->signal_activate().connect([this](const Glib::VariantBase&){
         this->on_show_about();
     });
 
-    // this->add_action(openaction);
-    this->add_action(aboutaction);
-    this->add_action(quitaction);
+    open_action.get()->signal_activate().connect([this](const Glib::VariantBase&){
+        auto window = create_window();
+        this->add_window(*window);
+        window->open_file_dialog();
+    });
+
+    this->add_action(open_action.get());
+    this->add_action(about_action.get());
+    this->add_action(quit_action.get());
 }
 
 Application::~Application()
@@ -49,13 +62,9 @@ void
 Application::on_activate()
 {
     Gtk::Application::on_activate();
-    auto window = new Window();
+    auto window = create_window();
     this->add_window(*window);
-    window->show_all();
-    window->signal_delete_event().connect([window](GdkEventAny *e){
-        delete window;
-        return true;
-    });
+    window->open_file_dialog();
 }
 
 void

@@ -44,6 +44,6 @@ pkg_check_modules(SOURCEVIEW gtksourceviewmm-3.0)
 add_subdirectory(sqlitemm)
 
 
-add_executable(gsqlite gsqlite application window tableview sqlview value_column query_result_widget)
+add_executable(gsqlite gsqlite actions application window tableview sqlview value_column query_result_widget)
 target_link_libraries(gsqlite ${SQLITEMM_LIBRARIES} ${SOURCEVIEW_LIBRARIES} ${GTKMM_LIBRARIES})
 target_include_directories(gsqlite PRIVATE ${GTKMM_INCLUDE_DIRS} ${SOURCEVIEW_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR})
